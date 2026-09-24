@@ -519,8 +519,11 @@
         <!-- Vista Previa A4 con Logotipo Oficial Permanente -->
         <div id="actaPreviewDocumento" class="acta-a4-preview">
             <!-- Logotipo Institucional Incrustado en Base64 -->
-            <div class="acta-header">
-                <img class="acta-logo-img" src="data:image/png;base64,<!-- Inserta el base64 o usa el archivo CONSULTAPATRIMONIO_CORREGIDO.html descargable -->" alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú">
+           <div class="acta-header">
+                <img class="acta-logo-img" 
+                     src="https://mijaelcode.github.io/inventario-midis/logo.png" 
+                     crossorigin="anonymous"
+                     alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú">
             </div>
 
             <div class="acta-title">"ACTA DE DESPLAZAMIENTO DE EQUIPAMIENTO Y MATERIAL DE CÓMPUTO"</div>
@@ -1118,6 +1121,13 @@
 
     // VISTA PREVIA DE IMPRESIÓN (NATIVO A4)
     function imprimirVistaPreviaActa() {
+
+.acta-logo-img {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
         window.print();
     }
 
