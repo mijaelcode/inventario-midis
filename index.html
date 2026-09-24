@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Patrimonial TIC - MIDIS 2026</title>
+    <!-- Tipografía Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --accent-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            
+            --rojo-bg: #fef2f2;
+            --rojo-border: #ef4444;
+            --rojo-text: #991b1b;
+            --verde-bg: #f0fdf4;
+            --verde-border: #22c55e;
+            --verde-text: #166534;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-dark); padding: 16px 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 1040px; }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            padding: 20px 24px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-title h1 { font-size: 19px; font-weight: 800; }
+        .header-title p { font-size: 12.5px; opacity: 0.85; margin-top: 3px; }
+
+        .nav-modules {
+            display: flex; gap: 6px; margin-bottom: 16px; background: #e2e8f0; padding: 6px; border-radius: 12px;
+        }
+        .mod-btn {
+            flex: 1; padding: 11px; font-size: 13px; font-weight: 700; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text-muted); transition: 0.2s; text-align: center;
+        }
+        .mod-btn.active {
+            background: #ffffff; color: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+        }
+
+        .sync-box {
+            background: var(--accent-light);
+            border: 1.5px dashed #bfdbfe;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+        .sync-box label { font-size: 11.5px; font-weight: 700; color: #1e40af; display: block; margin-bottom: 5px; }
+        .input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .input-text {
+            flex: 1; min-width: 250px; padding: 9px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;
+        }
+
+        .btn {
+            border: none; padding: 9px 16px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-blue { background: var(--accent); color: white; }
+        .btn-green { background: #16a34a; color: white; }
+        .btn-gray { background: #e2e8f0; color: #334155; }
+
+        .badge-status {
+            font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block;
+        }
+        .badge-wait { background: #fee2e2; color: #b91c1c; }
+        .badge-ok { background: #dcfce7; color: #15803d; }
+
+        .tab-nav { display: flex; gap: 6px; border-bottom: 2px solid #e2e8f0; margin-bottom: 14px; }
+        .tab-btn {
+            flex: 1; padding: 10px; font-size: 13px; font-weight: 700; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; color: var(--text-muted);
+        }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        .search-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+        .search-bar input {
+            flex: 1; min-width: 220px; padding: 10px 14px; font-size: 14px; border: 1.5px solid var(--border); border-radius: 8px; outline: none;
+        }
+        .search-bar input:focus { border-color: var(--accent); }
+
+        .dni-list { margin-top: 12px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .dni-item { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 13px; }
+        .dni-item:hover { background: #f8fafc; }
+
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .metric-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
+        .metric-box .t { font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
+        .metric-box .v { font-size: 13.5px; font-weight: 700; color: var(--text-dark); margin-top: 4px; }
+
+        .ai-card { padding: 12px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; line-height: 1.45; border: 1.5px solid; }
+        .ai-card.rojo { background-color: var(--rojo-bg); border-color: var(--rojo-border); color: var(--rojo-text); }
+        .ai-card.verde { background-color: var(--verde-bg); border-color: var(--verde-border); color: var(--verde-text); }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th, .data-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .data-table th { width: 33%; background: #f8fafc; color: var(--text-muted); }
+        .editable { width: 100%; padding: 7px 10px; font-size: 13px; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; font-weight: 600; }
+
+        .filter-grid-3 {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;
+        }
+        .filter-group label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+        .filter-group select, .filter-group input {
+            width: 100%; padding: 9px 10px; font-size: 13px; border: 1.5px solid #cbd5e1; border-radius: 7px; outline: none; background: #fff; font-weight: 600;
+        }
+
+        .clean-report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .clean-report-table th { background: #1e293b; color: white; padding: 8px 10px; text-align: left; font-size: 11.5px; }
+        .clean-report-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        .clean-report-table tr:nth-child(even) { background: #f8fafc; }
+
+        /* ========================================================================= */
+        /* FORMATO EXACTO A4 (210mm x 297mm) - MÁRGENES OFICIALES MIDIS             */
+        /* ========================================================================= */
+        .acta-a4-preview {
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            box-sizing: border-box;
+            padding: 22mm 25mm 20mm 30mm;
+            background: #ffffff;
+            color: #000000;
+            margin: 10px auto;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+            line-height: 1.35;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .acta-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .acta-logo-img {
+            height: 42px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .acta-title {
+            text-align: center;
+            font-size: 11pt;
+            font-weight: bold;
+            margin: 8px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .acta-checks-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 25px;
+            margin-bottom: 14px;
+            font-size: 10.5pt;
+            font-weight: bold;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .check-box-square {
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid #000;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11pt;
+            background: #fff;
+        }
+
+        .acta-body-text {
+            text-align: justify;
+            margin-bottom: 14px;
+            font-size: 10pt;
+            line-height: 1.45;
+        }
+
+        .inline-editable {
+            font-weight: bold;
+            border-bottom: 1px dashed #94a3b8;
+            padding: 0 3px;
+            outline: none;
+            display: inline-block;
+        }
+        .inline-editable:focus {
+            background-color: #fef9c3;
+            border-bottom: 1.5px solid #000;
+        }
+
+        .acta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 16px 0;
+            font-size: 9pt;
+        }
+        .acta-table th, .acta-table td {
+            border: 1px solid #000;
+            padding: 6px 5px;
+            text-align: center;
+        }
+        .acta-table th {
+            background-color: #ffffff;
+            font-weight: bold;
+        }
+        .acta-table td:nth-child(2) {
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .acta-closing {
+            font-size: 10pt;
+            margin-bottom: 25px;
+        }
+
+        .acta-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+        .signature-column {
+            width: 44%;
+            font-size: 9.5pt;
+            line-height: 1.35;
+        }
+        .sig-role-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            text-align: center;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
+        }
+        .sig-line {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .acta-footer-note {
+            font-size: 8pt;
+            color: #222;
+            margin-top: 15px;
+            border-top: 0.5px solid #888;
+            padding-top: 5px;
+        }
+
+        @media print {
+            body {
+                background: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .header, .nav-modules, .card, .sync-box, #modulo-consulta, #modulo-reporte {
+                display: none !important;
+            }
+            #modulo-acta {
+                display: block !important;
+            }
+            #modulo-acta > .card {
+                display: none !important;
+            }
+            .acta-a4-preview {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title">
+            <h1>GESTIÓN PATRIMONIAL TIC - MIDIS</h1>
+            <p>Inventario 2026: CPU/Laptops, Monitores, Teclados y Generación de Actas</p>
+        </div>
+        <span id="badgeConexion" class="badge-status badge-wait">Sin conexión a Drive</span>
+    </div>
+
+    <!-- Navegación de 3 Módulos -->
+    <div class="nav-modules">
+        <button class="mod-btn active" onclick="cambiarModulo('modulo-consulta', this)">🔍 MÓDULO 1: CONSULTA Y EDICIÓN</button>
+        <button class="mod-btn" onclick="cambiarModulo('modulo-reporte', this)">📊 MÓDULO 2: REPORTE POR ÁREA</button>
+        <button class="mod-btn" onclick="cambiarModulo('modulo-acta', this)">📑 MÓDULO 3: ACTA DE ENTREGA / RECEPCIÓN (A4)</button>
+    </div>
+
+    <!-- Conexión Compartida a Google Apps Script -->
+    <div class="card" style="padding: 12px 16px; margin-bottom: 14px;">
+        <div class="sync-box" style="margin-bottom: 0;">
+            <label>ENLACE WEB DE GOOGLE APPS SCRIPT (/exec):</label>
+            <div class="input-row">
+                <input type="text" id="scriptUrl" class="input-text" placeholder="https://script.google.com/macros/s/.../exec">
+                <button class="btn btn-blue" onclick="conectarDrive()">🔄 Sincronizar Drive</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 1: CONSULTA Y EDICIÓN -->
+    <div id="modulo-consulta" class="modulo-content">
+        <div class="card">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="cambiarSubTab('tab-cod', this)">POR CÓDIGO PATRIMONIAL</button>
+                <button class="tab-btn" onclick="cambiarSubTab('tab-dni', this)">POR DNI DEL RESPONSABLE</button>
+            </div>
+
+            <div id="tab-cod" class="subtab-content" style="display: block;">
+                <div class="search-bar">
+                    <input type="text" id="inCod" placeholder="Código Patrimonial (Ej. 740805000636, 740877001163)...">
+                    <button class="btn btn-blue" onclick="buscarPorCodigo()">Consultar</button>
+                    <button class="btn btn-gray" onclick="limpiarConsulta()">🧹 Limpiar</button>
+                </div>
+            </div>
+
+            <div id="tab-dni" class="subtab-content" style="display: none;">
+                <div class="search-bar">
+                    <input type="text" id="inDni" placeholder="DNI del Responsable (Ej. 70491560, 42103986, 10019878)...">
+                    <button class="btn btn-blue" onclick="buscarPorDni()">Buscar Todos los Bienes</button>
+                    <button class="btn btn-gray" onclick="limpiarConsulta()">🧹 Limpiar</button>
+                </div>
+                <div id="listaDni" class="dni-list" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div id="fichaCard" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h2 id="fBienTitulo" style="font-size: 17px; color: var(--primary); font-weight: 800;"></h2>
+                <span id="fBadgePestana" style="font-size: 11px; background:#e2e8f0; font-weight:700; padding:3px 8px; border-radius:4px;"></span>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-box"><div class="t">Modelo / Marca</div><div class="v" id="fModelo">-</div></div>
+                <div class="metric-box"><div class="t">Ambiente / Ubicación</div><div class="v" id="fAmbiente">-</div></div>
+                <div class="metric-box"><div class="t">Antigüedad</div><div class="v" id="fAntiguedad">-</div></div>
+                <div class="metric-box"><div class="t">Estado / Condición</div><div class="v" id="fSituacion">-</div></div>
+            </div>
+
+            <div id="fAiBox" class="ai-card"></div>
+
+            <table class="data-table">
+                <tr><th>Código Patrimonial</th><td id="fCodigo" style="font-weight: 700; font-family: 'JetBrains Mono', monospace;">-</td></tr>
+                <tr><th>Serie</th><td id="fSerie" style="font-family: 'JetBrains Mono', monospace;">-</td></tr>
+                <tr><th>USUARIO RESPONSABLE</th><td><input type="text" id="editUsuario" class="editable"></td></tr>
+                <tr><th>DNI RESPONSABLE</th><td><input type="text" id="editDni" class="editable" style="max-width: 160px;"></td></tr>
+                <tr><th>ÁREA / DEPENDENCIA</th><td><input type="text" id="editArea" class="editable"></td></tr>
+                <tr><th>SUB-ÁREA</th><td><input type="text" id="editSubArea" class="editable"></td></tr>
+                <tr><th>Condición de Uso</th><td id="fUso">-</td></tr>
+                <tr><th>Especificaciones Técnicas</th><td id="fSpecs">-</td></tr>
+            </table>
+
+            <div style="margin-top: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-green" id="btnSave" onclick="guardarCambios(false)">💾 Guardar en Google Drive</button>
+                <button class="btn btn-blue" id="btnSaveAll" onclick="guardarCambios(true)" style="display: none;">👥 Aplicar a TODOS sus Equipos</button>
+                <button class="btn btn-gray" onclick="limpiarConsulta()">🧹 Limpiar</button>
+                <span id="saveNotice" style="font-size: 13px; font-weight: 700;"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 2: REPORTE POR ÁREA Y SUBÁREA -->
+    <div id="modulo-reporte" class="modulo-content" style="display: none;">
+        <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 12px; color: var(--primary);">Filtro por Gerencia, Área y Subárea</h2>
+            
+            <div class="filter-grid-3">
+                <div class="filter-group">
+                    <label>1. GERENCIA / ÓRGANO:</label>
+                    <select id="m2Gerencia" onchange="m2CambioGerencia()">
+                        <option value="">-- Seleccione Gerencia --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>2. ÁREA / DEPENDENCIA:</label>
+                    <select id="m2Area" onchange="m2CambioArea()">
+                        <option value="">-- Todas las Áreas --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>3. SUB-ÁREA / OFICINA:</label>
+                    <select id="m2SubArea" onchange="generarReporteModulo2()">
+                        <option value="">-- Todas las Subáreas --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-blue" onclick="generarReporteModulo2()">Generar Reporte</button>
+                <button class="btn btn-gray" onclick="limpiarReporteModulo2()">Limpiar Filtros</button>
+            </div>
+        </div>
+
+        <div id="m2ContenedorReporte" class="card" style="display: none;">
+            <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="font-size: 15px; text-transform: uppercase;">Consolidado de Equipos de Cómputo por Dependencia</h3>
+                <p id="m2Metadatos" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;"></p>
+            </div>
+
+            <table class="clean-report-table">
+                <thead>
+                    <tr>
+                        <th style="width: 4%;">N°</th>
+                        <th style="width: 24%;">USUARIO RESPONSABLE / DNI</th>
+                        <th style="width: 14%;">CÓDIGO PATRIMONIAL</th>
+                        <th style="width: 22%;">CPU / LAPTOP</th>
+                        <th style="width: 20%;">MONITOR</th>
+                        <th style="width: 16%;">TECLADO</th>
+                    </tr>
+                </thead>
+                <tbody id="m2TableBody"></tbody>
+            </table>
+
+            <div id="m2Resumen" style="margin-top: 12px; font-size: 11.5px; font-weight: 700; color: #334155;"></div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 3: ACTA OFICIAL A4 -->
+    <div id="modulo-acta" class="modulo-content" style="display: none;">
+        <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 12px; color: var(--primary);">Configuración del Servidor y Asignación de Bienes</h2>
+            
+            <div class="filter-grid-3">
+                <div class="filter-group">
+                    <label>1. GERENCIA:</label>
+                    <select id="m3Gerencia" onchange="m3CambioGerencia()">
+                        <option value="">-- Seleccione Gerencia --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>2. ÁREA:</label>
+                    <select id="m3Area" onchange="m3CambioArea()">
+                        <option value="">-- Seleccione Área --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>3. SUB-ÁREA:</label>
+                    <select id="m3SubArea" onchange="m3CambioSubArea()">
+                        <option value="">-- Seleccione Subárea --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-grid-3">
+                <div class="filter-group">
+                    <label>4. SERVIDOR (USUARIO RESPONSABLE):</label>
+                    <select id="m3Servidor" onchange="m3SeleccionarServidor()">
+                        <option value="">-- Seleccione Servidor --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>5. TIPO DE BIEN A AGREGAR:</label>
+                    <select id="m3TipoBien">
+                        <option value="LAPTOP">Laptop</option>
+                        <option value="CPU">CPU</option>
+                        <option value="MONITOR">Monitor</option>
+                        <option value="TECLADO">Teclado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>6. BUSCAR BIEN POR CÓDIGO O SERIE:</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="text" id="m3InCodigoBien" placeholder="Código / Serie...">
+                        <button class="btn btn-blue" onclick="m3AgregarBienAlActa()">+ Añadir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
+                <!-- Botón de Vista Previa de Impresión -->
+                <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa de Impresión</button>
+                <button class="btn btn-gray" onclick="m3LimpiarActa()">🧹 Limpiar Tabla del Acta</button>
+            </div>
+        </div>
+
+        <!-- Vista Previa A4 con Logotipo Oficial Permanente -->
+        <div id="actaPreviewDocumento" class="acta-a4-preview">
+            <!-- Logotipo Institucional Incrustado en Base64 -->
+            <div class="acta-header">
+                <img class="acta-logo-img" src="data:image/png;base64,<!-- Inserta el base64 o usa el archivo CONSULTAPATRIMONIO_CORREGIDO.html descargable -->" alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú">
+            </div>
+
+            <div class="acta-title">"ACTA DE DESPLAZAMIENTO DE EQUIPAMIENTO Y MATERIAL DE CÓMPUTO"</div>
+
+            <div class="acta-checks-container">
+                <div class="check-item" onclick="alternarModoActa('ENTREGA')">
+                    <span>Entrega</span>
+                    <div class="check-box-square" id="boxEntrega">X</div>
+                </div>
+                <div class="check-item" onclick="alternarModoActa('RECEPCION')">
+                    <span>Recepción</span>
+                    <div class="check-box-square" id="boxRecepcion">&nbsp;</div>
+                </div>
+            </div>
+
+            <div class="acta-body-text">
+                En la ciudad de Lima, <span id="actaFecha" class="inline-editable" contenteditable="true">25 Junio del 2026</span> mediante el presente documento el Ministerio de Desarrollo e Inclusión Social, a través de la Oficina General de Tecnologías de la Información, dirección en la Av. Paseo de la Republica 3101 – San Isidro, se realiza la <span id="actaAccionTxt" style="text-transform: uppercase;">ENTREGA</span> del siguiente dispositivo Informático a la Sra <span id="actaServidorNom" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span>.<br>
+                Quien labora en el <span id="actaServidorArea" class="inline-editable" contenteditable="true">PROCURADURIA PÚBLICA</span>.
+            </div>
+
+            <table class="acta-table" id="tablaActaOficial">
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">Nº</th>
+                        <th style="width: 45%;">Detalle del Bien que se recibe y/o entrega</th>
+                        <th style="width: 12%;">Cantidad</th>
+                        <th style="width: 18%;">N° de Serie</th>
+                        <th style="width: 18%;">Cod Patrimonial</th>
+                    </tr>
+                </thead>
+                <tbody id="actaTableBody">
+                    <tr>
+                        <td>01</td>
+                        <td contenteditable="true">UNIDAD CENTRAL DE PROCESO - CPU LENOVO THINKCENTRE M70S GEN5</td>
+                        <td contenteditable="true">1</td>
+                        <td contenteditable="true">GMOWZ2S2</td>
+                        <td contenteditable="true">740899501756</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="acta-closing">En fe de lo cual firman la presente acta en 02 (dos) ejemplares.</div>
+
+            <!-- Bloque de Firmas: Nombre y DNI del servidor sincronizados -->
+            <div class="acta-signatures">
+                <div class="signature-column">
+                    <div class="sig-role-title" id="sigTituloIzq">ENTREGUÉ CONFORME</div>
+                    <div class="sig-line">Nombre: <span id="sigNomIzq" class="inline-editable" contenteditable="true">Mijael Rivera Lopez</span></div>
+                    <div class="sig-line">DNI: <span id="sigDniIzq" class="inline-editable" contenteditable="true">48100357</span></div>
+                </div>
+
+                <div class="signature-column">
+                    <div class="sig-role-title" id="sigTituloDer">RECIBÍ CONFORME</div>
+                    <div class="sig-line">Nombre: <span id="sigNomDer" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span></div>
+                    <div class="sig-line">DNI: <span id="sigDniDer" class="inline-editable" contenteditable="true">72953853</span></div>
+                </div>
+            </div>
+
+            <div class="acta-footer-note">
+                Nota: Marcar con una X en los recuadros según corresponda a la entrega o recepción de un bien Informático.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let inventario = [];
+    let bienSeleccionado = null;
+    let urlScript = "";
+    let modoActaActual = "ENTREGA";
+
+    const normalizarDni = (v) => String(v || "").replace(/\.0$/, "").trim();
+    const limpiarStr = (v) => String(v || "").replace(/\.0$/, "").trim();
+
+    function cambiarModulo(id, btn) {
+        document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.modulo-content').forEach(m => m.style.display = 'none');
+        btn.classList.add('active');
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function cambiarSubTab(id, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.subtab-content').forEach(s => s.style.display = 'none');
+        btn.classList.add('active');
+        document.getElementById(id).style.display = 'block';
+    }
+
+    async function conectarDrive() {
+        urlScript = document.getElementById("scriptUrl").value.trim();
+        const badge = document.getElementById("badgeConexion");
+
+        if (!urlScript.includes("/exec")) {
+            alert("Ingresa la URL válida de Apps Script (/exec).");
+            return;
+        }
+
+        badge.className = "badge-status badge-wait";
+        badge.innerText = "⏳ Sincronizando...";
+
+        try {
+            const res = await fetch(urlScript);
+            inventario = await res.json();
+
+            badge.className = "badge-status badge-ok";
+            badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
+            localStorage.setItem("script_patrimonio_2026", urlScript);
+
+            inicializarFiltrosModulo2();
+            inicializarFiltrosModulo3();
+        } catch (e) {
+            console.error(e);
+            badge.className = "badge-status badge-wait";
+            badge.innerText = "❌ Error de conexión";
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const guardada = localStorage.getItem("script_patrimonio_2026");
+        if (guardada) {
+            document.getElementById("scriptUrl").value = guardada;
+            conectarDrive();
+        }
+
+        // Sincronización en tiempo real si el usuario edita el nombre directamente en el texto
+        const elemNomTexto = document.getElementById("actaServidorNom");
+        if (elemNomTexto) {
+            elemNomTexto.addEventListener("input", function() {
+                const nuevoNom = this.innerText.trim();
+                if (modoActaActual === "ENTREGA") {
+                    document.getElementById("sigNomDer").innerText = nuevoNom;
+                } else {
+                    document.getElementById("sigNomIzq").innerText = nuevoNom;
+                }
+            });
+        }
+    });
+
+    function buscarPorCodigo() {
+        const cod = limpiarStr(document.getElementById("inCod").value);
+        if (!cod) { alert("Ingresa un código patrimonial."); return; }
+
+        const item = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === cod);
+        if (!item) { alert(`No se encontró el bien: ${cod}`); return; }
+        mostrarFicha(item, false);
+    }
+
+    function buscarPorDni() {
+        const dniBuscado = normalizarDni(document.getElementById("inDni").value);
+        const listaDiv = document.getElementById("listaDni");
+        listaDiv.style.display = "none";
+        listaDiv.innerHTML = "";
+
+        if (!dniBuscado) { alert("Ingresa un DNI."); return; }
+
+        const coincidencias = inventario.filter(r => normalizarDni(r["DNI"]) === dniBuscado);
+        if (!coincidencias.length) {
+            alert(`No se encontraron equipos registrados para el DNI: ${dniBuscado}`);
+            return;
+        }
+
+        if (coincidencias.length === 1) {
+            mostrarFicha(coincidencias[0], false);
+            return;
+        }
+
+        listaDiv.style.display = "block";
+        let html = `<div style="padding:10px 14px; background:#e2e8f0; font-weight:700; font-size:12px;">Equipos encontrados para este DNI (${coincidencias.length} bienes): Selecciona uno</div>`;
+        coincidencias.forEach((item, idx) => {
+            const cod = limpiarStr(item["SBN_CONCILIADO"]);
+            const desc = item["DESCRIPCION DEL BIEN"] || "EQUIPO";
+            const mod = `${item["MARCA"] || ""} ${item["MODELO"] || ""}`.trim();
+            html += `
+                <div class="dni-item" onclick="seleccionarDniItem(${idx})">
+                    <b>${cod}</b> | ${desc} (${mod}) [${item._pestana}]<br>
+                    <small style="color:var(--text-muted)">Ambiente: ${item["AMBIENTE"] || "-"} | Antigüedad: ${item["ANTIGÜEDAD"] || "-"}</small>
+                </div>
+            `;
+        });
+        listaDiv.innerHTML = html;
+        window._coincidencias = coincidencias;
+    }
+
+    function seleccionarDniItem(idx) {
+        document.getElementById("listaDni").style.display = "none";
+        mostrarFicha(window._coincidencias[idx], true);
+    }
+
+    function mostrarFicha(item, permitirTodos) {
+        bienSeleccionado = item;
+        document.getElementById("fBienTitulo").innerText = item["DESCRIPCION DEL BIEN"] || "EQUIPO INFORMÁTICO";
+        document.getElementById("fBadgePestana").innerText = `Pestaña: ${item._pestana}`;
+        document.getElementById("fModelo").innerText = `${item["MARCA"] || ""} ${item["MODELO"] || ""}`.trim() || "-";
+        document.getElementById("fAmbiente").innerText = item["AMBIENTE"] || "-";
+        document.getElementById("fAntiguedad").innerText = item["ANTIGÜEDAD"] || "No registrada";
+        document.getElementById("fSituacion").innerText = item["SITUACION"] || item["CONDICION"] || "-";
+
+        document.getElementById("fCodigo").innerText = limpiarStr(item["SBN_CONCILIADO"]);
+        document.getElementById("fSerie").innerText = item["SERIE"] || "-";
+        document.getElementById("editUsuario").value = item["USUARIO RESPONSABLE"] || "";
+        document.getElementById("editDni").value = normalizarDni(item["DNI"]);
+        document.getElementById("editArea").value = item["AREA"] || item["GERENCIA"] || "";
+        document.getElementById("editSubArea").value = item["SUBAREA"] || "";
+        document.getElementById("fUso").innerText = item["USO"] || "-";
+
+        const specs = [
+            item["PROCESADOR"] ? `CPU: ${item["PROCESADOR"]}` : '',
+            item["RAM"] ? `RAM: ${item["RAM"]}` : '',
+            item["DISCO DURO"] ? `Disco: ${item["DISCO DURO"]}` : '',
+            item["IP"] ? `IP: ${item["IP"]}` : ''
+        ].filter(Boolean).join(" | ") || "-";
+        document.getElementById("fSpecs").innerText = specs;
+
+        const aiBox = document.getElementById("fAiBox");
+        const strAnt = String(item["ANTIGÜEDAD"] || "").toLowerCase();
+        let anios = 0;
+        const match = strAnt.match(/(\d+)\s*año/);
+        if (match) anios = parseInt(match[1], 10);
+        else if (strAnt.includes("mes") && !strAnt.includes("año")) anios = 0;
+        else anios = parseInt(strAnt.replace(/\D+/g, ''), 10) || 0;
+
+        if (anios <= 4) {
+            aiBox.className = "ai-card verde";
+            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO TÉCNICO: NUEVO / CONSERVADO</b><br>Antigüedad: <b>${item["ANTIGÜEDAD"] || "Menor a 4 años"}</b> (Rango $\\le$ 4 años). Vigente y operativo.`;
+        } else {
+            aiBox.className = "ai-card rojo";
+            aiBox.innerHTML = `<b>🔴 DIAGNÓSTICO TÉCNICO: OBSOLETO</b><br>Antigüedad: <b>${item["ANTIGÜEDAD"]}</b> (Supera 4 años). Elegible prioritario para renovación IOARR.`;
+        }
+
+        document.getElementById("btnSaveAll").style.display = permitirTodos ? "inline-block" : "none";
+        document.getElementById("fichaCard").style.display = "block";
+        document.getElementById("fichaCard").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function guardarCambios(actualizarTodos) {
+        if (!bienSeleccionado || !urlScript) return;
+
+        const nuevoUsuario = document.getElementById("editUsuario").value.trim();
+        const nuevoDni = normalizarDni(document.getElementById("editDni").value);
+        const nuevaArea = document.getElementById("editArea").value.trim();
+        const nuevaSubArea = document.getElementById("editSubArea").value.trim();
+        const notice = document.getElementById("saveNotice");
+        const btn = document.getElementById("btnSave");
+
+        btn.disabled = true;
+        notice.style.color = "var(--accent)";
+        notice.innerText = "⏳ Guardando en Drive...";
+
+        const payload = {
+            codigo: limpiarStr(bienSeleccionado["SBN_CONCILIADO"]),
+            dniAntiguo: normalizarDni(bienSeleccionado["DNI"]),
+            nuevoUsuario: nuevoUsuario,
+            nuevoDni: nuevoDni,
+            nuevaArea: nuevaArea,
+            nuevaSubArea: nuevaSubArea,
+            actualizarTodos: actualizarTodos
+        };
+
+        try {
+            await fetch(urlScript, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (actualizarTodos) {
+                const dniAnt = normalizarDni(bienSeleccionado["DNI"]);
+                inventario.forEach(r => {
+                    if (normalizarDni(r["DNI"]) === dniAnt) {
+                        r["USUARIO RESPONSABLE"] = nuevoUsuario;
+                        r["DNI"] = nuevoDni;
+                        r["AREA"] = nuevaArea;
+                        r["SUBAREA"] = nuevaSubArea;
+                    }
+                });
+            } else {
+                bienSeleccionado["USUARIO RESPONSABLE"] = nuevoUsuario;
+                bienSeleccionado["DNI"] = nuevoDni;
+                bienSeleccionado["AREA"] = nuevaArea;
+                bienSeleccionado["SUBAREA"] = nuevaSubArea;
+            }
+
+            notice.style.color = "var(--verde-text)";
+            notice.innerText = "✅ ¡Actualizado en Drive!";
+            setTimeout(() => { notice.innerText = ""; }, 4000);
+        } catch (e) {
+            console.error(e);
+            notice.style.color = "var(--rojo-text)";
+            notice.innerText = "❌ Error al guardar.";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function limpiarConsulta() {
+        document.getElementById("inCod").value = "";
+        document.getElementById("inDni").value = "";
+        document.getElementById("listaDni").style.display = "none";
+        document.getElementById("fichaCard").style.display = "none";
+        bienSeleccionado = null;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function inicializarFiltrosModulo2() {
+        const selG = document.getElementById("m2Gerencia");
+        selG.innerHTML = '<option value="">-- Seleccione Gerencia --</option>';
+        const gerencias = [...new Set(inventario.map(r => (r["GERENCIA"] || "").trim()).filter(Boolean))].sort();
+        gerencias.forEach(g => {
+            const opt = document.createElement("option");
+            opt.value = g; opt.textContent = g;
+            selG.appendChild(opt);
+        });
+    }
+
+    function m2CambioGerencia() {
+        const ger = document.getElementById("m2Gerencia").value;
+        const selA = document.getElementById("m2Area");
+        const selS = document.getElementById("m2SubArea");
+        selA.innerHTML = '<option value="">-- Todas las Áreas --</option>';
+        selS.innerHTML = '<option value="">-- Todas las Subáreas --</option>';
+
+        if (!ger) return;
+
+        const areas = [...new Set(inventario.filter(r => (r["GERENCIA"] || "").trim() === ger)
+            .map(r => (r["AREA"] || "").trim()).filter(Boolean))].sort();
+        areas.forEach(a => {
+            const opt = document.createElement("option"); opt.value = a; opt.textContent = a;
+            selA.appendChild(opt);
+        });
+        generarReporteModulo2();
+    }
+
+    function m2CambioArea() {
+        const ger = document.getElementById("m2Gerencia").value;
+        const area = document.getElementById("m2Area").value;
+        const selS = document.getElementById("m2SubArea");
+        selS.innerHTML = '<option value="">-- Todas las Subáreas --</option>';
+
+        let subset = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger);
+        if (area) subset = subset.filter(r => (r["AREA"] || "").trim() === area);
+
+        const subareas = [...new Set(subset.map(r => (r["SUBAREA"] || "").trim()).filter(Boolean))].sort();
+        subareas.forEach(s => {
+            const opt = document.createElement("option"); opt.value = s; opt.textContent = s;
+            selS.appendChild(opt);
+        });
+        generarReporteModulo2();
+    }
+
+    function generarReporteModulo2() {
+        const ger = document.getElementById("m2Gerencia").value;
+        const area = document.getElementById("m2Area").value;
+        const sub = document.getElementById("m2SubArea").value;
+        const cont = document.getElementById("m2ContenedorReporte");
+        const tbody = document.getElementById("m2TableBody");
+
+        if (!ger) {
+            cont.style.display = "none";
+            return;
+        }
+
+        let lista = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger);
+        if (area) lista = lista.filter(r => (r["AREA"] || "").trim() === area);
+        if (sub) lista = lista.filter(r => (r["SUBAREA"] || "").trim() === sub);
+
+        let mapU = new Map();
+        lista.forEach(item => {
+            const dni = normalizarDni(item["DNI"]);
+            const nom = (item["USUARIO RESPONSABLE"] || "SIN ASIGNAR").trim();
+            const key = dni ? `${dni}_${nom}` : `S_DNI_${item["SBN_CONCILIADO"]}`;
+
+            if (!mapU.has(key)) {
+                mapU.set(key, { nom: nom, dni: dni || "S/DNI", cods: [], cpus: [], mons: [], tecs: [] });
+            }
+            const u = mapU.get(key);
+            const cod = limpiarStr(item["SBN_CONCILIADO"]);
+            const mod = `${item["MARCA"] || ""} ${item["MODELO"] || ""}`.trim();
+            const p = (item._pestana || "").toUpperCase();
+
+            u.cods.push(cod);
+            if (p.includes("CPU") || p.includes("LAPTO")) u.cpus.push(`${cod} - ${mod}`);
+            else if (p.includes("MONITOR")) u.mons.push(`${cod} - ${mod}`);
+            else if (p.includes("TECLADO")) u.tecs.push(`${cod} - ${mod}`);
+        });
+
+        tbody.innerHTML = "";
+        let c = 1;
+        mapU.forEach(u => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="text-align:center;">${c++}</td>
+                <td><b>${u.nom}</b><br><span style="color:#64748b;">DNI: ${u.dni}</span></td>
+                <td>${u.cods.join(", ")}</td>
+                <td>${u.cpus.length ? u.cpus.join("<br>") : "-"}</td>
+                <td>${u.mons.length ? u.mons.join("<br>") : "-"}</td>
+                <td>${u.tecs.length ? u.tecs.join("<br>") : "-"}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("m2Metadatos").innerText = `GERENCIA: ${ger} | ÁREA: ${area || "TODAS"} | SUBÁREA: ${sub || "TODAS"}`;
+        document.getElementById("m2Resumen").innerText = `Total Servidores: ${mapU.size} | Total Bienes Asignados: ${lista.length}`;
+        cont.style.display = "block";
+    }
+
+    function limpiarReporteModulo2() {
+        document.getElementById("m2Gerencia").value = "";
+        document.getElementById("m2Area").innerHTML = '<option value="">-- Todas las Áreas --</option>';
+        document.getElementById("m2SubArea").innerHTML = '<option value="">-- Todas las Subáreas --</option>';
+        document.getElementById("m2ContenedorReporte").style.display = "none";
+    }
+
+    function inicializarFiltrosModulo3() {
+        const selG = document.getElementById("m3Gerencia");
+        selG.innerHTML = '<option value="">-- Seleccione Gerencia --</option>';
+        const gerencias = [...new Set(inventario.map(r => (r["GERENCIA"] || "").trim()).filter(Boolean))].sort();
+        gerencias.forEach(g => {
+            const opt = document.createElement("option"); opt.value = g; opt.textContent = g;
+            selG.appendChild(opt);
+        });
+    }
+
+    function m3CambioGerencia() {
+        const ger = document.getElementById("m3Gerencia").value;
+        const selA = document.getElementById("m3Area");
+        const selS = document.getElementById("m3SubArea");
+        const selU = document.getElementById("m3Servidor");
+        selA.innerHTML = '<option value="">-- Seleccione Área --</option>';
+        selS.innerHTML = '<option value="">-- Seleccione Subárea --</option>';
+        selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
+
+        if (!ger) return;
+        const areas = [...new Set(inventario.filter(r => (r["GERENCIA"] || "").trim() === ger)
+            .map(r => (r["AREA"] || "").trim()).filter(Boolean))].sort();
+        areas.forEach(a => {
+            const opt = document.createElement("option"); opt.value = a; opt.textContent = a;
+            selA.appendChild(opt);
+        });
+    }
+
+    function m3CambioArea() {
+        const ger = document.getElementById("m3Gerencia").value;
+        const area = document.getElementById("m3Area").value;
+        const selS = document.getElementById("m3SubArea");
+        const selU = document.getElementById("m3Servidor");
+        selS.innerHTML = '<option value="">-- Seleccione Subárea --</option>';
+        selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
+
+        if (!area) return;
+        let sub = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger && (r["AREA"] || "").trim() === area);
+        const subareas = [...new Set(sub.map(r => (r["SUBAREA"] || "").trim()).filter(Boolean))].sort();
+        subareas.forEach(s => {
+            const opt = document.createElement("option"); opt.value = s; opt.textContent = s;
+            selS.appendChild(opt);
+        });
+    }
+
+    function m3CambioSubArea() {
+        const ger = document.getElementById("m3Gerencia").value;
+        const area = document.getElementById("m3Area").value;
+        const sub = document.getElementById("m3SubArea").value;
+        const selU = document.getElementById("m3Servidor");
+        selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
+
+        let subset = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger && (r["AREA"] || "").trim() === area);
+        if (sub) subset = subset.filter(r => (r["SUBAREA"] || "").trim() === sub);
+
+        let mapServ = new Map();
+        subset.forEach(r => {
+            const nom = (r["USUARIO RESPONSABLE"] || "").trim();
+            const dni = normalizarDni(r["DNI"]);
+            if (nom && !mapServ.has(nom)) mapServ.set(nom, dni);
+        });
+
+        mapServ.forEach((dni, nom) => {
+            const opt = document.createElement("option");
+            opt.value = nom;
+            opt.dataset.dni = dni;
+            opt.textContent = `${nom} (DNI: ${dni || "S/DNI"})`;
+            selU.appendChild(opt);
+        });
+    }
+
+    // CORRECCIÓN: Garantiza que Nombre y DNI se asignen siempre a la firma
+    function m3SeleccionarServidor() {
+        const sel = document.getElementById("m3Servidor");
+        const nom = sel.value;
+        if (!nom) return;
+
+        const opt = sel.options[sel.selectedIndex];
+        const dni = opt.dataset.dni || "";
+        const area = document.getElementById("m3Area").value || document.getElementById("m3Gerencia").value;
+
+        // Actualizar cuerpo del texto
+        document.getElementById("actaServidorNom").innerText = nom;
+        document.getElementById("actaServidorArea").innerText = area;
+
+        // Actualizar firma del Servidor
+        if (modoActaActual === "ENTREGA") {
+            document.getElementById("sigNomDer").innerText = nom;
+            document.getElementById("sigDniDer").innerText = dni;
+        } else {
+            document.getElementById("sigNomIzq").innerText = nom;
+            document.getElementById("sigDniIzq").innerText = dni;
+        }
+    }
+
+    function m3AgregarBienAlActa() {
+        const tipoBien = document.getElementById("m3TipoBien").value;
+        const query = limpiarStr(document.getElementById("m3InCodigoBien").value);
+        if (!query) { alert("Ingresa un código patrimonial o número de serie."); return; }
+
+        const bien = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === query || limpiarStr(r["SERIE"]) === query);
+        
+        let detalle = "";
+        let serie = "-";
+        let codigo = query;
+
+        if (bien) {
+            detalle = `${bien["DESCRIPCION DEL BIEN"] || tipoBien} ${bien["MARCA"] || ""} ${bien["MODELO"] || ""}`.trim();
+            serie = bien["SERIE"] || "-";
+            codigo = limpiarStr(bien["SBN_CONCILIADO"]);
+        } else {
+            detalle = `${tipoBien} (REGISTRO)`;
+            serie = query;
+        }
+
+        const tbody = document.getElementById("actaTableBody");
+        const nro = String(tbody.rows.length + 1).padStart(2, '0');
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${nro}</td>
+            <td contenteditable="true">${detalle}</td>
+            <td contenteditable="true">1</td>
+            <td contenteditable="true">${serie}</td>
+            <td contenteditable="true">${codigo}</td>
+        `;
+        tbody.appendChild(tr);
+        document.getElementById("m3InCodigoBien").value = "";
+    }
+
+    function alternarModoActa(modo) {
+        modoActaActual = modo;
+        const boxEnt = document.getElementById("boxEntrega");
+        const boxRec = document.getElementById("boxRecepcion");
+        const txtAccion = document.getElementById("actaAccionTxt");
+
+        const titIzq = document.getElementById("sigTituloIzq");
+        const nomIzq = document.getElementById("sigNomIzq");
+        const dniIzq = document.getElementById("sigDniIzq");
+
+        const titDer = document.getElementById("sigTituloDer");
+        const nomDer = document.getElementById("sigNomDer");
+        const dniDer = document.getElementById("sigDniDer");
+
+        const servidorNom = document.getElementById("actaServidorNom").innerText.trim();
+        const selServ = document.getElementById("m3Servidor");
+        const servidorDni = (selServ.options[selServ.selectedIndex] ? selServ.options[selServ.selectedIndex].dataset.dni : "") || document.getElementById("sigDniDer").innerText.trim();
+
+        const ogtiNom = "Mijael Rivera Lopez";
+        const ogtiDni = "48100357";
+
+        if (modo === "ENTREGA") {
+            boxEnt.innerText = "X";
+            boxRec.innerHTML = "&nbsp;";
+            txtAccion.innerText = "ENTREGA";
+
+            titIzq.innerText = "ENTREGUÉ CONFORME";
+            nomIzq.innerText = ogtiNom;
+            dniIzq.innerText = ogtiDni;
+
+            titDer.innerText = "RECIBÍ CONFORME";
+            nomDer.innerText = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE";
+            dniDer.innerText = servidorDni || "72953853";
+        } else {
+            boxEnt.innerHTML = "&nbsp;";
+            boxRec.innerText = "X";
+            txtAccion.innerText = "RECEPCIÓN";
+
+            titIzq.innerText = "ENTREGUÉ CONFORME";
+            nomIzq.innerText = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE";
+            dniIzq.innerText = servidorDni || "72953853";
+
+            titDer.innerText = "RECIBÍ CONFORME";
+            nomDer.innerText = ogtiNom;
+            dniDer.innerText = ogtiDni;
+        }
+    }
+
+    function m3LimpiarActa() {
+        document.getElementById("actaTableBody").innerHTML = "";
+    }
+
+    // VISTA PREVIA DE IMPRESIÓN (NATIVO A4)
+    function imprimirVistaPreviaActa() {
+        window.print();
+    }
+
+    document.getElementById("inCod").addEventListener("keyup", e => { if (e.key === "Enter") buscarPorCodigo(); });
+    document.getElementById("inDni").addEventListener("keyup", e => { if (e.key === "Enter") buscarPorDni(); });
+    document.getElementById("m3InCodigoBien").addEventListener("keyup", e => { if (e.key === "Enter") m3AgregarBienAlActa(); });
+</script>
+
+</body>
+</html>
