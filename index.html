@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión Patrimonial TIC - MIDIS 2026</title>
-    <!-- Tipografía Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -19,7 +18,6 @@
             --border: #cbd5e1;
             --text-dark: #0f172a;
             --text-muted: #64748b;
-            
             --rojo-bg: #fef2f2;
             --rojo-border: #ef4444;
             --rojo-text: #991b1b;
@@ -66,19 +64,6 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.03);
         }
 
-        .sync-box {
-            background: var(--accent-light);
-            border: 1.5px dashed #bfdbfe;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-        }
-        .sync-box label { font-size: 11.5px; font-weight: 700; color: #1e40af; display: block; margin-bottom: 5px; }
-        .input-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .input-text {
-            flex: 1; min-width: 250px; padding: 9px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;
-        }
-
         .btn {
             border: none; padding: 9px 16px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
         }
@@ -86,6 +71,7 @@
         .btn-blue { background: var(--accent); color: white; }
         .btn-green { background: #16a34a; color: white; }
         .btn-gray { background: #e2e8f0; color: #334155; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .badge-status {
             font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block;
@@ -136,9 +122,7 @@
         .clean-report-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
         .clean-report-table tr:nth-child(even) { background: #f8fafc; }
 
-        /* ========================================================================= */
-        /* FORMATO EXACTO A4 (210mm x 297mm) - MÁRGENES OFICIALES MIDIS             */
-        /* ========================================================================= */
+        /* Formato A4 oficial MIDIS */
         .acta-a4-preview {
             width: 210mm;
             height: 297mm;
@@ -156,160 +140,30 @@
             overflow: hidden;
         }
 
-        .acta-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .acta-logo-img {
-            height: 42px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-        }
+        .acta-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .acta-logo-img { height: 42px; width: auto; object-fit: contain; display: block; }
+        .acta-title { text-align: center; font-size: 11pt; font-weight: bold; margin: 8px 0 10px 0; text-transform: uppercase; letter-spacing: 0.3px; }
 
-        .acta-title {
-            text-align: center;
-            font-size: 11pt;
-            font-weight: bold;
-            margin: 8px 0 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
+        .acta-checks-container { display: flex; justify-content: flex-end; gap: 25px; margin-bottom: 14px; font-size: 10.5pt; font-weight: bold; }
+        .check-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .check-box-square { width: 18px; height: 18px; border: 1.5px solid #000; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11pt; background: #fff; }
 
-        .acta-checks-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 25px;
-            margin-bottom: 14px;
-            font-size: 10.5pt;
-            font-weight: bold;
-        }
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        .check-box-square {
-            width: 18px;
-            height: 18px;
-            border: 1.5px solid #000;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 11pt;
-            background: #fff;
-        }
+        .acta-body-text { text-align: justify; margin-bottom: 14px; font-size: 10pt; line-height: 1.45; }
+        .inline-editable { font-weight: bold; border-bottom: 1px dashed #94a3b8; padding: 0 3px; outline: none; display: inline-block; }
+        .inline-editable:focus { background-color: #fef9c3; border-bottom: 1.5px solid #000; }
 
-        .acta-body-text {
-            text-align: justify;
-            margin-bottom: 14px;
-            font-size: 10pt;
-            line-height: 1.45;
-        }
+        .acta-table { width: 100%; border-collapse: collapse; margin: 12px 0 16px 0; font-size: 9pt; }
+        .acta-table th, .acta-table td { border: 1px solid #000; padding: 6px 5px; text-align: center; }
+        .acta-table th { background-color: #ffffff; font-weight: bold; }
+        .acta-table td:nth-child(2) { text-align: left; padding-left: 8px; }
 
-        .inline-editable {
-            font-weight: bold;
-            border-bottom: 1px dashed #94a3b8;
-            padding: 0 3px;
-            outline: none;
-            display: inline-block;
-        }
-        .inline-editable:focus {
-            background-color: #fef9c3;
-            border-bottom: 1.5px solid #000;
-        }
+        .acta-closing { font-size: 10pt; margin-bottom: 25px; }
+        .acta-signatures { display: flex; justify-content: space-between; margin-top: 25px; margin-bottom: 20px; padding: 0 10px; }
+        .signature-column { width: 44%; font-size: 9.5pt; line-height: 1.35; }
+        .sig-role-title { font-weight: bold; text-transform: uppercase; margin-bottom: 35px; text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px; }
+        .sig-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .acta-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0 16px 0;
-            font-size: 9pt;
-        }
-        .acta-table th, .acta-table td {
-            border: 1px solid #000;
-            padding: 6px 5px;
-            text-align: center;
-        }
-        .acta-table th {
-            background-color: #ffffff;
-            font-weight: bold;
-        }
-        .acta-table td:nth-child(2) {
-            text-align: left;
-            padding-left: 8px;
-        }
-
-        .acta-closing {
-            font-size: 10pt;
-            margin-bottom: 25px;
-        }
-
-        .acta-signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-        }
-        .signature-column {
-            width: 44%;
-            font-size: 9.5pt;
-            line-height: 1.35;
-        }
-        .sig-role-title {
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 35px;
-            text-align: center;
-            border-bottom: 1px solid #000;
-            padding-bottom: 3px;
-        }
-        .sig-line {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .acta-footer-note {
-            font-size: 8pt;
-            color: #222;
-            margin-top: 15px;
-            border-top: 0.5px solid #888;
-            padding-top: 5px;
-        }
-
-        @media print {
-            body {
-                background: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .header, .nav-modules, .card, .sync-box, #modulo-consulta, #modulo-reporte {
-                display: none !important;
-            }
-            #modulo-acta {
-                display: block !important;
-            }
-            #modulo-acta > .card {
-                display: none !important;
-            }
-            .acta-a4-preview {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-        }
+        .acta-footer-note { font-size: 8pt; color: #222; margin-top: 15px; border-top: 0.5px solid #888; padding-top: 5px; }
     </style>
 </head>
 <body>
@@ -320,25 +174,13 @@
             <h1>GESTIÓN PATRIMONIAL TIC - MIDIS</h1>
             <p>Inventario 2026: CPU/Laptops, Monitores, Teclados y Generación de Actas</p>
         </div>
-        <span id="badgeConexion" class="badge-status badge-wait">Sin conexión a Drive</span>
+        <span id="badgeConexion" class="badge-status badge-wait">Sincronizando con Drive...</span>
     </div>
 
-    <!-- Navegación de 3 Módulos -->
     <div class="nav-modules">
         <button class="mod-btn active" onclick="cambiarModulo('modulo-consulta', this)">🔍 MÓDULO 1: CONSULTA Y EDICIÓN</button>
         <button class="mod-btn" onclick="cambiarModulo('modulo-reporte', this)">📊 MÓDULO 2: REPORTE POR ÁREA</button>
         <button class="mod-btn" onclick="cambiarModulo('modulo-acta', this)">📑 MÓDULO 3: ACTA DE ENTREGA / RECEPCIÓN (A4)</button>
-    </div>
-
-    <!-- Conexión Compartida a Google Apps Script -->
-    <div class="card" style="padding: 12px 16px; margin-bottom: 14px;">
-        <div class="sync-box" style="margin-bottom: 0;">
-            <label>ENLACE WEB DE GOOGLE APPS SCRIPT (/exec):</label>
-            <div class="input-row">
-                <input type="text" id="scriptUrl" class="input-text" placeholder="https://script.google.com/macros/s/.../exec">
-                <button class="btn btn-blue" onclick="conectarDrive()">🔄 Sincronizar Drive</button>
-            </div>
-        </div>
     </div>
 
     <!-- MÓDULO 1: CONSULTA Y EDICIÓN -->
@@ -402,7 +244,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 2: REPORTE POR ÁREA Y SUBÁREA -->
+    <!-- MÓDULO 2: REPORTE POR ÁREA -->
     <div id="modulo-reporte" class="modulo-content" style="display: none;">
         <div class="card">
             <h2 style="font-size: 16px; margin-bottom: 12px; color: var(--primary);">Filtro por Gerencia, Área y Subárea</h2>
@@ -430,6 +272,7 @@
 
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <button class="btn btn-blue" onclick="generarReporteModulo2()">Generar Reporte</button>
+                <button class="btn btn-green" id="btnVistaPreviaM2" onclick="imprimirVistaPreviaReporte()" disabled>🖨️ Vista Previa de Impresión</button>
                 <button class="btn btn-gray" onclick="limpiarReporteModulo2()">Limpiar Filtros</button>
             </div>
         </div>
@@ -458,7 +301,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 3: ACTA OFICIAL A4 -->
+    <!-- MÓDULO 3: ACTA DE ENTREGA / RECEPCIÓN -->
     <div id="modulo-acta" class="modulo-content" style="display: none;">
         <div class="card">
             <h2 style="font-size: 16px; margin-bottom: 12px; color: var(--primary);">Configuración del Servidor y Asignación de Bienes</h2>
@@ -510,20 +353,17 @@
             </div>
 
             <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
-                <!-- Botón de Vista Previa de Impresión -->
+                <button class="btn btn-blue" id="btnSyncM3" onclick="sincronizarDriveDesdeM3()">🔄 Sincronizar con Drive</button>
                 <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa de Impresión</button>
                 <button class="btn btn-gray" onclick="m3LimpiarActa()">🧹 Limpiar Tabla del Acta</button>
+                <span id="m3SyncNotice" style="font-size: 12.5px; font-weight: 700;"></span>
             </div>
         </div>
 
-        <!-- Vista Previa A4 con Logotipo Oficial Permanente -->
         <div id="actaPreviewDocumento" class="acta-a4-preview">
-            <!-- Logotipo Institucional Incrustado en Base64 -->
-           <div class="acta-header">
-                <img class="acta-logo-img" 
-                     src="https://mijaelcode.github.io/inventario-midis/logo.png" 
-                     crossorigin="anonymous"
-                     alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú">
+            <div class="acta-header">
+                <!-- Se recomienda usar el archivo index.html descargable para contar con la cadena Base64 completa del logo -->
+                <img class="acta-logo-img" src="logo.png" alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú" onerror="this.src='https://mijaelcode.github.io/inventario-midis/logo.png'">
             </div>
 
             <div class="acta-title">"ACTA DE DESPLAZAMIENTO DE EQUIPAMIENTO Y MATERIAL DE CÓMPUTO"</div>
@@ -567,7 +407,6 @@
 
             <div class="acta-closing">En fe de lo cual firman la presente acta en 02 (dos) ejemplares.</div>
 
-            <!-- Bloque de Firmas: Nombre y DNI del servidor sincronizados -->
             <div class="acta-signatures">
                 <div class="signature-column">
                     <div class="sig-role-title" id="sigTituloIzq">ENTREGUÉ CONFORME</div>
@@ -592,7 +431,7 @@
 <script>
     let inventario = [];
     let bienSeleccionado = null;
-    let urlScript = "https://script.google.com/macros/s/AKfycbzfE5071D71f4npgqkPxHV896fJHh4LjePKNG6MY8r3U__3QTfJQSELwqwKDb4Qtix_/exec";
+    let urlScript = "https://script.google.com/macros/s/AKfycby8S3YlBr5BvtRswSaB8rYKCN1DUQSX9TvjuSlwJjy--GqBRUTzu0Ugj7BxiwwwV1ev8Q/exec";
     let modoActaActual = "ENTREGA";
 
     const normalizarDni = (v) => String(v || "").replace(/\.0$/, "").trim();
@@ -612,43 +451,94 @@
         document.getElementById(id).style.display = 'block';
     }
 
-    async function conectarDrive() {
-        urlScript = document.getElementById("scriptUrl").value.trim();
+    async function conectarDrive(forzar = false) {
         const badge = document.getElementById("badgeConexion");
+        badge.className = "badge-status badge-wait";
+        badge.innerText = "⏳ Sincronizando con Drive...";
 
-        if (!urlScript.includes("/exec")) {
-            alert("Ingresa la URL válida de Apps Script (/exec).");
-            return;
+        if (!forzar) {
+            const cacheLocal = localStorage.getItem("cache_inventario_midis_2026");
+            if (cacheLocal && inventario.length === 0) {
+                try {
+                    inventario = JSON.parse(cacheLocal);
+                    badge.className = "badge-status badge-ok";
+                    badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
+                    inicializarFiltrosModulo2();
+                    inicializarFiltrosModulo3();
+                } catch(e) {}
+            }
         }
 
-        badge.className = "badge-status badge-wait";
-        badge.innerText = "⏳ Sincronizando...";
+        if (!urlScript || !urlScript.includes("/exec")) {
+            badge.className = "badge-status badge-wait";
+            badge.innerText = "❌ URL de Apps Script no válida (/exec requerida)";
+            return false;
+        }
 
         try {
-            const res = await fetch(urlScript);
-            inventario = await res.json();
+            const fetchUrl = forzar ? (urlScript + (urlScript.includes("?") ? "&" : "?") + "refresh=1&_t=" + Date.now()) : urlScript;
+            
+            const res = await fetch(fetchUrl, {
+                method: "GET",
+                redirect: "follow",
+                headers: { "Accept": "application/json" }
+            });
 
-            badge.className = "badge-status badge-ok";
-            badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
-            localStorage.setItem("script_patrimonio_2026", urlScript);
+            if (!res.ok) throw new Error(`HTTP ${res.status}: Servidor no disponible`);
 
-            inicializarFiltrosModulo2();
-            inicializarFiltrosModulo3();
+            const texto = await res.text();
+            if (texto.trim().startsWith("<")) {
+                throw new Error("Google devolvió una página de acceso. En Apps Script configure 'Quién tiene acceso: Cualquier usuario'");
+            }
+
+            const data = JSON.parse(texto);
+            if (Array.isArray(data) && data.length > 0) {
+                inventario = data;
+                localStorage.setItem("cache_inventario_midis_2026", JSON.stringify(data));
+                badge.className = "badge-status badge-ok";
+                badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
+                inicializarFiltrosModulo2();
+                inicializarFiltrosModulo3();
+                return true;
+            } else {
+                throw new Error("No se encontraron registros en las pestañas del archivo.");
+            }
         } catch (e) {
-            console.error(e);
-            badge.className = "badge-status badge-wait";
-            badge.innerText = "❌ Error de conexión";
+            console.error("Error conexión Drive:", e);
+            if (inventario.length > 0) {
+                badge.className = "badge-status badge-ok";
+                badge.innerText = `✅ Drive Activo (${inventario.length} bienes en memoria)`;
+                return true;
+            } else {
+                badge.className = "badge-status badge-wait";
+                badge.innerText = "❌ Error de conexión con Drive";
+                return false;
+            }
         }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-        const guardada = localStorage.getItem("script_patrimonio_2026");
-        if (guardada) {
-            document.getElementById("scriptUrl").value = guardada;
-            conectarDrive();
-        }
+    async function sincronizarDriveDesdeM3() {
+        const btn = document.getElementById("btnSyncM3");
+        const notice = document.getElementById("m3SyncNotice");
+        btn.disabled = true;
+        notice.style.color = "var(--accent)";
+        notice.innerText = "⏳ Sincronizando con Drive...";
 
-        // Sincronización en tiempo real si el usuario edita el nombre directamente en el texto
+        const ok = await conectarDrive(true);
+        if (ok) {
+            notice.style.color = "var(--verde-text)";
+            notice.innerText = `✅ ¡Sincronizado! (${inventario.length} bienes)`;
+        } else {
+            notice.style.color = "var(--rojo-text)";
+            notice.innerText = "❌ Error al sincronizar.";
+        }
+        btn.disabled = false;
+        setTimeout(() => { notice.innerText = ""; }, 4000);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        conectarDrive();
+
         const elemNomTexto = document.getElementById("actaServidorNom");
         if (elemNomTexto) {
             elemNomTexto.addEventListener("input", function() {
@@ -880,9 +770,11 @@
         const sub = document.getElementById("m2SubArea").value;
         const cont = document.getElementById("m2ContenedorReporte");
         const tbody = document.getElementById("m2TableBody");
+        const btnV = document.getElementById("btnVistaPreviaM2");
 
         if (!ger) {
             cont.style.display = "none";
+            if (btnV) btnV.disabled = true;
             return;
         }
 
@@ -928,6 +820,7 @@
         document.getElementById("m2Metadatos").innerText = `GERENCIA: ${ger} | ÁREA: ${area || "TODAS"} | SUBÁREA: ${sub || "TODAS"}`;
         document.getElementById("m2Resumen").innerText = `Total Servidores: ${mapU.size} | Total Bienes Asignados: ${lista.length}`;
         cont.style.display = "block";
+        if (btnV) btnV.disabled = false;
     }
 
     function limpiarReporteModulo2() {
@@ -935,6 +828,8 @@
         document.getElementById("m2Area").innerHTML = '<option value="">-- Todas las Áreas --</option>';
         document.getElementById("m2SubArea").innerHTML = '<option value="">-- Todas las Subáreas --</option>';
         document.getElementById("m2ContenedorReporte").style.display = "none";
+        const btnV = document.getElementById("btnVistaPreviaM2");
+        if (btnV) btnV.disabled = true;
     }
 
     function inicializarFiltrosModulo3() {
@@ -1008,7 +903,6 @@
         });
     }
 
-    // CORRECCIÓN: Garantiza que Nombre y DNI se asignen siempre a la firma
     function m3SeleccionarServidor() {
         const sel = document.getElementById("m3Servidor");
         const nom = sel.value;
@@ -1018,11 +912,9 @@
         const dni = opt.dataset.dni || "";
         const area = document.getElementById("m3Area").value || document.getElementById("m3Gerencia").value;
 
-        // Actualizar cuerpo del texto
         document.getElementById("actaServidorNom").innerText = nom;
         document.getElementById("actaServidorArea").innerText = area;
 
-        // Actualizar firma del Servidor
         if (modoActaActual === "ENTREGA") {
             document.getElementById("sigNomDer").innerText = nom;
             document.getElementById("sigDniDer").innerText = dni;
@@ -1119,16 +1011,92 @@
         document.getElementById("actaTableBody").innerHTML = "";
     }
 
-    // VISTA PREVIA DE IMPRESIÓN (NATIVO A4)
-    function imprimirVistaPreviaActa() {
+    // Ventana de impresión limpia que elude el bloqueo de iframes en Tiiny Host
+    function abrirVentanaImpresion(contenidoHtml, estilosAdicionales = '') {
+        const printWindow = window.open('', '_blank', 'width=900,height=800');
+        if (!printWindow) {
+            window.print();
+            return;
+        }
+        printWindow.document.open();
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Vista Previa de Impresión - MIDIS 2026</title>
+                <style>
+                    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+                    body { background: #fff; padding: 0; margin: 0; color: #000; }
+                    @page { size: A4 portrait; margin: 0; }
+                    .acta-a4-preview {
+                        width: 210mm;
+                        height: 297mm;
+                        max-height: 297mm;
+                        box-sizing: border-box;
+                        padding: 22mm 25mm 20mm 30mm;
+                        margin: 0 auto;
+                        background: #fff;
+                        overflow: hidden;
+                        page-break-after: avoid;
+                    }
+                    .acta-header { display: flex; align-items: center; margin-bottom: 12px; }
+                    .acta-logo-img { height: 42px; width: auto; object-fit: contain; display: block; }
+                    .acta-title { text-align: center; font-size: 11pt; font-weight: bold; margin: 8px 0 10px 0; text-transform: uppercase; }
+                    .acta-checks-container { display: flex; justify-content: flex-end; gap: 25px; margin-bottom: 14px; font-size: 10.5pt; font-weight: bold; }
+                    .check-item { display: flex; align-items: center; gap: 6px; }
+                    .check-box-square { width: 18px; height: 18px; border: 1.5px solid #000; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11pt; }
+                    .acta-body-text { text-align: justify; margin-bottom: 14px; font-size: 10pt; line-height: 1.45; }
+                    .inline-editable { font-weight: bold; padding: 0 3px; }
+                    .acta-table { width: 100%; border-collapse: collapse; margin: 12px 0 16px 0; font-size: 9pt; }
+                    .acta-table th, .acta-table td { border: 1px solid #000; padding: 6px 5px; text-align: center; }
+                    .acta-table th { background-color: #fff; font-weight: bold; }
+                    .acta-table td:nth-child(2) { text-align: left; padding-left: 8px; }
+                    .acta-closing { font-size: 10pt; margin-bottom: 25px; }
+                    .acta-signatures { display: flex; justify-content: space-between; margin-top: 25px; margin-bottom: 20px; padding: 0 10px; }
+                    .signature-column { width: 44%; font-size: 9.5pt; line-height: 1.35; }
+                    .sig-role-title { font-weight: bold; text-transform: uppercase; margin-bottom: 35px; text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px; }
+                    .sig-line { white-space: nowrap; }
+                    .acta-footer-note { font-size: 8pt; color: #222; margin-top: 15px; border-top: 0.5px solid #888; padding-top: 5px; }
+                    
+                    .clean-report-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-top: 10px; }
+                    .clean-report-table th { background: #1e293b; color: white; padding: 6px 8px; text-align: left; font-size: 9pt; border: 1px solid #334155; }
+                    .clean-report-table td { padding: 6px 8px; border: 1px solid #cbd5e1; vertical-align: top; }
+                    .clean-report-table tr:nth-child(even) { background: #f8fafc; }
+                    ${estilosAdicionales}
+                </style>
+            </head>
+            <body>
+                ${contenidoHtml}
+                <script>
+                    window.onload = function() {
+                        window.focus();
+                        window.print();
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
 
-.acta-logo-img {
-    height: 42px;
-    width: auto;
-    object-fit: contain;
-    display: block;
-}
-        window.print();
+    function imprimirVistaPreviaActa() {
+        const el = document.getElementById("actaPreviewDocumento");
+        if (!el) return;
+        abrirVentanaImpresion(el.outerHTML);
+    }
+
+    function imprimirVistaPreviaReporte() {
+        const el = document.getElementById("m2ContenedorReporte");
+        if (!el || el.style.display === "none") {
+            alert("Primero genera el reporte seleccionando una Gerencia.");
+            return;
+        }
+        const estilosReporte = `
+            @page { size: A4 landscape; margin: 12mm 15mm; }
+            body { padding: 10mm; }
+        `;
+        abrirVentanaImpresion(el.innerHTML, estilosReporte);
     }
 
     document.getElementById("inCod").addEventListener("keyup", e => { if (e.key === "Enter") buscarPorCodigo(); });
