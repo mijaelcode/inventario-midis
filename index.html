@@ -2,12 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Sistema de Gestión Patrimonial TIC - MIDIS 2026</title>
-    <!-- Fuentes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <!-- html2pdf y SheetJS (Excel) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -20,222 +18,256 @@
             --border: #cbd5e1;
             --text-dark: #0f172a;
             --text-muted: #64748b;
-
-            /* Colores Pasteles Suaves */
             --pastel-total-bg: #f1f5f9;
             --pastel-total-text: #1e293b;
             --pastel-total-border: #cbd5e1;
-
             --pastel-cpu-bg: #e0f2fe;
             --pastel-cpu-text: #0369a1;
             --pastel-cpu-border: #bae6fd;
-
             --pastel-mon-bg: #dcfce7;
             --pastel-mon-text: #15803d;
             --pastel-mon-border: #bbf7d0;
-
             --pastel-tec-bg: #fef3c7;
             --pastel-tec-text: #b45309;
             --pastel-tec-border: #fde68a;
-
-            /* Semáforo Técnico Pastel */
             --semaforo-verde-bg: #ecfdf5;
             --semaforo-verde-border: #10b981;
             --semaforo-verde-text: #065f46;
-
             --semaforo-amarillo-bg: #fffbeb;
             --semaforo-amarillo-border: #f59e0b;
             --semaforo-amarillo-text: #92400e;
-
             --semaforo-rojo-bg: #fef2f2;
             --semaforo-rojo-border: #ef4444;
             --semaforo-rojo-text: #991b1b;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+            --transition: all 0.2s ease;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg); color: var(--text-dark); padding: 14px 8px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 1080px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text-dark); padding: 12px 8px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 1200px; }
 
+        /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: #ffffff;
-            padding: 18px 22px;
-            border-radius: 12px;
+            color: #fff;
+            padding: clamp(14px, 3vw, 22px) clamp(16px, 3vw, 26px);
+            border-radius: var(--radius-lg);
             margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
+            box-shadow: var(--shadow-md);
         }
-        .header-title h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
-        .header-title p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+        .header-title h1 { font-size: clamp(15px, 2.2vw, 19px); font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; }
+        .header-title p { font-size: clamp(11px, 1.6vw, 13px); opacity: 0.85; margin-top: 4px; }
 
-        /* Navegación Modular (3 Módulos) */
-        .nav-modules {
-            display: flex; gap: 6px; margin-bottom: 14px; background: #e2e8f0; padding: 5px; border-radius: 10px; overflow-x: auto;
-        }
-        .mod-btn {
-            flex: 1; min-width: 200px; padding: 10px 8px; font-size: 12.5px; font-weight: 700; border: none; background: transparent; border-radius: 7px; cursor: pointer; color: var(--text-muted); transition: 0.2s; text-align: center; white-space: nowrap;
-        }
-        .mod-btn.active {
-            background: #ffffff; color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 18px;
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .btn {
-            border: none; padding: 9px 15px; border-radius: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn:hover { opacity: 0.93; transform: translateY(-1px); }
-        .btn-blue { background: var(--accent); color: white; }
-        .btn-green { background: #16a34a; color: white; }
-        .btn-gray { background: #e2e8f0; color: #334155; }
-        .btn-amber { background: #d97706; color: white; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .badge-status { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+        /* ===== BADGES ===== */
+        .badge-status { font-size: clamp(10px, 1.4vw, 11.5px); font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block; white-space: nowrap; }
         .badge-wait { background: #fee2e2; color: #b91c1c; }
         .badge-ok { background: #dcfce7; color: #15803d; }
 
-        .tab-nav { display: flex; gap: 6px; border-bottom: 2px solid #e2e8f0; margin-bottom: 14px; }
+        /* ===== NAV MÓDULOS ===== */
+        .nav-modules {
+            display: flex; gap: 6px; margin-bottom: 14px; background: #e2e8f0; padding: 5px; border-radius: var(--radius-md); overflow-x: auto; scrollbar-width: none;
+        }
+        .nav-modules::-webkit-scrollbar { display: none; }
+        .mod-btn {
+            flex: 1; min-width: 180px; padding: clamp(8px, 1.5vw, 11px) 10px; font-size: clamp(11px, 1.4vw, 12.5px); font-weight: 700; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); transition: var(--transition); text-align: center; white-space: nowrap;
+        }
+        .mod-btn:hover { color: var(--accent); }
+        .mod-btn.active { background: #fff; color: var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--card-bg); border-radius: var(--radius-lg); padding: clamp(12px, 2.5vw, 20px); border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow-sm); transition: var(--transition);
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+
+        /* ===== BOTONES ===== */
+        .btn {
+            border: none; padding: clamp(8px, 1.4vw, 10px) clamp(12px, 2vw, 16px); border-radius: var(--radius-sm); font-size: clamp(11px, 1.4vw, 12.5px); font-weight: 700; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
+        }
+        .btn:hover:not(:disabled) { opacity: 0.93; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn-blue { background: var(--accent); color: #fff; }
+        .btn-green { background: #16a34a; color: #fff; }
+        .btn-gray { background: #e2e8f0; color: #334155; }
+        .btn-amber { background: #d97706; color: #fff; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ===== TABS ===== */
+        .tab-nav { display: flex; gap: 6px; border-bottom: 2px solid #e2e8f0; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+        .tab-nav::-webkit-scrollbar { display: none; }
         .tab-btn {
-            flex: 1; padding: 10px; font-size: 12.5px; font-weight: 700; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; color: var(--text-muted);
+            flex: 1; min-width: 160px; padding: clamp(8px, 1.5vw, 11px) 10px; font-size: clamp(11px, 1.4vw, 12.5px); font-weight: 700; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; color: var(--text-muted); transition: var(--transition); white-space: nowrap;
         }
         .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+        /* ===== BÚSQUEDA ===== */
         .search-box-custom {
-            display: flex; gap: 8px; flex-wrap: wrap; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1.5px solid #cbd5e1;
+            display: flex; gap: 8px; flex-wrap: wrap; background: #f8fafc; padding: clamp(10px, 2vw, 14px); border-radius: var(--radius-md); border: 1.5px solid #cbd5e1;
         }
         .search-input-field {
-            flex: 1; min-width: 260px; padding: 10px 14px; font-size: 13.5px; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff;
+            flex: 1; min-width: 220px; padding: clamp(9px, 1.6vw, 11px) 14px; font-size: clamp(12px, 1.5vw, 13.5px); border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); outline: none; background: #fff; transition: var(--transition);
         }
-        .search-input-field:focus { border-color: var(--accent); }
+        .search-input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-        /* Contadores en Tonos Pasteles */
+        /* ===== STATS PASTEL ===== */
         .stat-grid-colored {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;
         }
         .stat-card-colored {
-            padding: 12px 14px; border-radius: 8px; border: 1px solid; display: flex; flex-direction: column; justify-content: center;
+            padding: clamp(10px, 1.8vw, 14px); border-radius: var(--radius-md); border: 1px solid; display: flex; flex-direction: column; justify-content: center; transition: var(--transition);
         }
-        .stat-card-colored .stat-label { font-size: 11px; text-transform: uppercase; font-weight: 700; opacity: 0.9; }
-        .stat-card-colored .stat-num { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+        .stat-card-colored:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .stat-card-colored .stat-label { font-size: clamp(9px, 1.2vw, 11px); text-transform: uppercase; font-weight: 700; opacity: 0.9; }
+        .stat-card-colored .stat-num { font-size: clamp(20px, 3vw, 26px); font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
 
-        /* Barra Horizontal del Servidor */
+        /* ===== BARRA HORIZONTAL SERVIDOR ===== */
         .person-horizontal-bar {
-            background: #f1f5f9; border: 1.5px solid #cbd5e1; border-left: 5px solid var(--accent); border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 12px;
+            background: #f1f5f9; border: 1.5px solid #cbd5e1; border-left: 5px solid var(--accent); border-radius: var(--radius-md); padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2vw, 18px); margin-bottom: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; font-size: 12px;
         }
-        .person-horizontal-bar div b { display: block; color: var(--text-muted); font-size: 10px; text-transform: uppercase; margin-bottom: 2px; }
-        .person-horizontal-bar div span { font-weight: 700; color: var(--text-dark); font-size: 13px; }
+        .person-horizontal-bar div b { display: block; color: var(--text-muted); font-size: clamp(9px, 1.2vw, 10px); text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.3px; }
+        .person-horizontal-bar div span { font-weight: 700; color: var(--text-dark); font-size: clamp(12px, 1.5vw, 13.5px); }
 
-        /* Paneles Verticales Pulidos */
-        .two-columns-vertical {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-        }
-        @media (max-width: 768px) {
-            .two-columns-vertical { grid-template-columns: 1fr; }
-        }
+        /* ===== DOS COLUMNAS ===== */
+        .two-columns-vertical { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 900px) { .two-columns-vertical { grid-template-columns: 1fr; } }
 
         .vertical-pane {
-            background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: clamp(12px, 2vw, 16px); box-shadow: var(--shadow-sm);
         }
-        .pane-title { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .pane-title { font-size: clamp(12px, 1.5vw, 13.5px); font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-        .field-group { margin-bottom: 9px; }
-        .field-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
+        /* ===== CAMPOS ===== */
+        .field-group { margin-bottom: 10px; }
+        .field-group label { display: block; font-size: clamp(10px, 1.2vw, 11px); font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
         .input-control {
-            width: 100%; padding: 7px 10px; font-size: 12px; border: 1.5px solid #cbd5e1; border-radius: 5px; outline: none; font-weight: 600; background: #ffffff;
+            width: 100%; padding: clamp(7px, 1.3vw, 9px) 10px; font-size: clamp(11.5px, 1.4vw, 12.5px); border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); outline: none; font-weight: 600; background: #fff; transition: var(--transition);
         }
-        .input-control:focus { border-color: var(--accent); }
+        .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
         .input-control:disabled { background: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
+        .input-control:not(:disabled):hover { border-color: #94a3b8; }
 
-        /* Diagnóstico Técnico Semaforizado */
-        .ai-card { padding: 11px 13px; border-radius: 6px; font-size: 12px; line-height: 1.45; border: 1.5px solid; margin-bottom: 12px; }
-        .ai-card.verde { background-color: var(--semaforo-verde-bg); border-color: var(--semaforo-verde-border); color: var(--semaforo-verde-text); }
-        .ai-card.amarillo { background-color: var(--semaforo-amarillo-bg); border-color: var(--semaforo-amarillo-border); color: var(--semaforo-amarillo-text); }
-        .ai-card.rojo { background-color: var(--semaforo-rojo-bg); border-color: var(--semaforo-rojo-border); color: var(--semaforo-rojo-text); }
+        /* ===== SEMÁFORO ===== */
+        .ai-card { padding: clamp(10px, 1.6vw, 13px) clamp(11px, 1.8vw, 15px); border-radius: var(--radius-sm); font-size: clamp(11px, 1.4vw, 12.5px); line-height: 1.5; border: 1.5px solid; margin-bottom: 12px; }
+        .ai-card.verde { background: var(--semaforo-verde-bg); border-color: var(--semaforo-verde-border); color: var(--semaforo-verde-text); }
+        .ai-card.amarillo { background: var(--semaforo-amarillo-bg); border-color: var(--semaforo-amarillo-border); color: var(--semaforo-amarillo-text); }
+        .ai-card.rojo { background: var(--semaforo-rojo-bg); border-color: var(--semaforo-rojo-border); color: var(--semaforo-rojo-text); }
 
-        /* Filtros Cascada Módulo 2 y 3 */
-        .filter-grid-4 {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px;
-        }
-        .filter-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
+        /* ===== FILTROS ===== */
+        .filter-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        .filter-group label { display: block; font-size: clamp(10px, 1.2vw, 11px); font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
         .filter-group select, .filter-group input {
-            width: 100%; padding: 8px 10px; font-size: 12.5px; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff; font-weight: 600;
+            width: 100%; padding: clamp(8px, 1.4vw, 9px) 10px; font-size: clamp(11.5px, 1.4vw, 12.5px); border: 1.5px solid #cbd5e1; border-radius: var(--radius-sm); outline: none; background: #fff; font-weight: 600; transition: var(--transition);
         }
+        .filter-group select:focus, .filter-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
 
-        .table-responsive-box { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .clean-report-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 10px; min-width: 650px; }
-        .clean-report-table th { background: #1e293b; color: white; padding: 8px 10px; text-align: left; font-size: 11px; }
+        /* ===== TABLAS ===== */
+        .table-responsive-box { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); }
+        .clean-report-table { width: 100%; border-collapse: collapse; font-size: clamp(10.5px, 1.3vw, 11.5px); margin-top: 10px; min-width: 650px; }
+        .clean-report-table th { background: #1e293b; color: #fff; padding: 8px 10px; text-align: left; font-size: clamp(10px, 1.2vw, 11px); position: sticky; top: 0; }
         .clean-report-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
         .clean-report-table tr:nth-child(even) { background: #f8fafc; }
+        .clean-report-table tr:hover { background: #f1f5f9; }
 
-        .badge-count-total {
-            background: #0f172a; color: #ffffff; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-size: 13px; display: inline-block;
-        }
-        .device-card-item {
-            background: #ffffff; border: 1px solid #cbd5e1; border-left: 3px solid var(--accent); padding: 4px 6px; border-radius: 4px; font-size: 11px; margin-bottom: 4px;
-        }
+        .badge-count-total { background: #0f172a; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; font-size: clamp(11px, 1.4vw, 13px); display: inline-block; }
+        .device-card-item { background: #fff; border: 1px solid #cbd5e1; border-left: 3px solid var(--accent); padding: 4px 6px; border-radius: 4px; font-size: clamp(10px, 1.2vw, 11px); margin-bottom: 4px; }
         .device-card-item b { font-family: 'JetBrains Mono', monospace; color: #1e293b; }
 
-        /* ========================================================================= */
-        /* MÓDULO 3: ACTA OFICIAL A4 CON ESPACIADOS MILIMÉTRICOS EXACTOS              */
-        /* ========================================================================= */
+        /* ===== ACTA A4 ===== */
         .acta-a4-preview {
-            width: 210mm;
-            min-height: 297mm;
-            box-sizing: border-box;
-            padding: 22mm 25mm 20mm 30mm;
-            background: #ffffff;
-            color: #000000;
-            margin: 10px auto;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 10pt;
-            line-height: 1.35;
-            position: relative;
+            width: 210mm; min-height: 297mm; box-sizing: border-box; padding: 22mm 25mm 20mm 30mm; background: #fff; color: #000; margin: 10px auto; box-shadow: var(--shadow-lg); font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.35; position: relative;
         }
-
         .acta-header { display: flex; align-items: center; margin-bottom: 1.0cm; }
         .acta-logo-img { height: 42px; width: auto; object-fit: contain; display: block; }
         .acta-title { text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.2px; }
-
-        .acta-checks-container { display: flex; justify-content: flex-end; gap: 25px; margin-bottom: 12px; font-size: 10pt; font-weight: bold; }
+        .acta-checks-container { display: flex; justify-content: flex-end; gap: 25px; margin-bottom: 12px; font-size: 10pt; font-weight: bold; flex-wrap: wrap; }
         .check-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .check-box-square { width: 17px; height: 17px; border: 1.5px solid #000; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10pt; background: #fff; }
-
         .acta-body-text { text-align: justify; margin-bottom: 1.5cm; font-size: 9.8pt; line-height: 1.45; }
-        .inline-editable { font-weight: bold; border-bottom: 1px dashed #94a3b8; padding: 0 3px; outline: none; display: inline-block; }
-        .inline-editable:focus { background-color: #fef9c3; border-bottom: 1.5px solid #000; }
-
+        .inline-editable { font-weight: bold; border-bottom: 1px dashed #94a3b8; padding: 0 3px; outline: none; display: inline-block; min-width: 40px; }
+        .inline-editable:focus { background: #fef9c3; border-bottom: 1.5px solid #000; }
         .acta-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5cm; font-size: 9pt; }
         .acta-table th, .acta-table td { border: 1px solid #000; padding: 5px 4px; text-align: center; }
-        .acta-table th { background-color: #ffffff; font-weight: bold; }
+        .acta-table th { background: #fff; font-weight: bold; }
         .acta-table td:nth-child(2) { text-align: left; padding-left: 6px; }
-
         .acta-closing { font-size: 9.8pt; margin-bottom: 10px; }
-
-        .acta-signatures-box {
-            display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 35px; padding: 0 10px;
-        }
-        .sig-col { width: 44%; text-align: center; font-size: 9pt; }
+        .acta-signatures-box { display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 35px; padding: 0 10px; flex-wrap: wrap; gap: 20px; }
+        .sig-col { width: 44%; text-align: center; font-size: 9pt; min-width: 220px; }
         .sig-role-text { font-weight: bold; text-transform: uppercase; margin-bottom: 4.5cm; }
         .sig-line-top { border-top: 1px solid #000; padding-top: 4px; width: 90%; margin: 0 auto; }
-        .sig-meta-line {    text-align: left;    width: 100%;    max-width: 255px;    line-height: 1.25;    font-size: 8.8pt;
-    white-space: normal; /* Salto de línea automático cuando el nombre sea largo */
-    word-break: break-word;
-    margin-bottom: 4px;
-}
+        .sig-meta-line { text-align: left; width: 100%; max-width: 255px; line-height: 1.25; font-size: 8.8pt; white-space: normal; word-break: break-word; margin-bottom: 4px; }
+        .acta-footer-note { position: absolute; bottom: 18mm; left: 30mm; right: 25mm; font-size: 8pt; color: #222; border-top: 0.5px solid #888; padding-top: 6px; text-align: left; }
 
-        .acta-footer-note {position: absolute; bottom: 18mm; left: 30mm; right: 25mm; font-size: 8pt; color: #222; border-top: 0.5px solid #888; padding-top: 6px; text-align: left;}
+        /* ===== RESPONSIVE ACTA ===== */
+        @media (max-width: 850px) {
+            .acta-a4-preview { width: 100%; min-height: auto; padding: 15px; font-size: 9pt; }
+            .acta-signatures-box { flex-direction: column; align-items: center; }
+            .sig-col { width: 100%; max-width: 320px; }
+            .sig-role-text { margin-bottom: 2.5cm; }
+            .acta-footer-note { position: static; margin-top: 20px; }
+        }
+
+        /* ===== MODO EDICIÓN AVANZADO ===== */
+        .edit-mode-toggle {
+            display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; border: 1px solid #cbd5e1;
+        }
+        .edit-mode-toggle label { font-size: 11.5px; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .edit-mode-toggle input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+
+        /* ===== RESPONSIVE MÓVIL ===== */
+        @media (max-width: 640px) {
+            body { padding: 6px 4px; }
+            .header { flex-direction: column; text-align: center; }
+            .nav-modules { flex-wrap: nowrap; }
+            .mod-btn { min-width: 150px; font-size: 11px; padding: 8px 6px; }
+            .tab-btn { min-width: 140px; }
+            .search-box-custom { flex-direction: column; }
+            .search-input-field { min-width: 100%; }
+            .stat-grid-colored { grid-template-columns: repeat(2, 1fr); }
+            .person-horizontal-bar { grid-template-columns: 1fr; }
+            .filter-grid-4 { grid-template-columns: 1fr; }
+            .btn { width: 100%; justify-content: center; }
+            .two-columns-vertical { gap: 10px; }
+            .pane-title { font-size: 12px; }
+            .acta-a4-preview { padding: 12px; font-size: 8.5pt; }
+            .acta-title { font-size: 9pt; }
+            .acta-body-text { font-size: 8.5pt; }
+            .acta-table { font-size: 8pt; }
+            .sig-role-text { margin-bottom: 2cm; }
+        }
+
+        @media (max-width: 400px) {
+            .stat-grid-colored { grid-template-columns: 1fr; }
+            .mod-btn { min-width: 120px; font-size: 10px; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .modulo-content, .card, .fichaConsultaCompleta { animation: fadeIn 0.3s ease; }
+
+        /* ===== UTILIDADES ===== */
+        .flex-wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .mt-10 { margin-top: 10px; }
+        .mb-10 { margin-bottom: 10px; }
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -249,16 +281,13 @@
         <span id="badgeConexion" class="badge-status badge-wait">Sincronizando con Drive...</span>
     </div>
 
-    <!-- Navegación de 3 Módulos (Módulo 4 Totalmente Eliminado) -->
     <div class="nav-modules">
         <button class="mod-btn active" onclick="cambiarModulo('modulo-consulta', this)">🔍 MÓDULO 1: CONSULTA Y EDICIÓN</button>
         <button class="mod-btn" onclick="cambiarModulo('modulo-reporte', this)">📊 MÓDULO 2: REPORTE POR ÁREA</button>
         <button class="mod-btn" onclick="cambiarModulo('modulo-acta', this)">📑 MÓDULO 3: ACTA DE ENTREGA / RECEPCIÓN</button>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MÓDULO 1: CONSULTA Y EDICIÓN                                              -->
-    <!-- ========================================================================= -->
+    <!-- ================= MÓDULO 1 ================= -->
     <div id="modulo-consulta" class="modulo-content">
         <div class="card">
             <div class="tab-nav">
@@ -266,20 +295,18 @@
                 <button class="tab-btn" onclick="cambiarSubTab('tab-cod', this)">2. POR CÓDIGO PATRIMONIAL</button>
             </div>
 
-            <!-- Búsqueda 1: Nombres / DNI -->
             <div id="tab-persona" class="subtab-content" style="display: block;">
                 <div class="search-box-custom">
-                    <input type="text" id="inPersona" list="listaAutocompletarPersonas" class="search-input-field" placeholder="Escribe DNI o Nombre y Apellidos (Ej. MINAYA, HUERTA, 48100357)...">
+                    <input type="text" id="inPersona" list="listaAutocompletarPersonas" class="search-input-field" placeholder="Escribe DNI o Nombre y Apellidos...">
                     <datalist id="listaAutocompletarPersonas"></datalist>
                     <button class="btn btn-blue" onclick="buscarPorPersona()">Consultar Servidor</button>
                     <button class="btn btn-gray" onclick="limpiarConsulta()">🧹 Limpiar</button>
                 </div>
             </div>
 
-            <!-- Búsqueda 2: Código Patrimonial -->
             <div id="tab-cod" class="subtab-content" style="display: none;">
                 <div class="search-box-custom">
-                    <input type="text" id="inCod" list="listaAutocompletarCodigos" class="search-input-field" placeholder="Escribe Código Patrimonial (Ej. 740805000636, 740899501756)...">
+                    <input type="text" id="inCod" list="listaAutocompletarCodigos" class="search-input-field" placeholder="Escribe Código Patrimonial...">
                     <datalist id="listaAutocompletarCodigos"></datalist>
                     <button class="btn btn-blue" onclick="buscarPorCodigo()">Consultar Bien</button>
                     <button class="btn btn-gray" onclick="limpiarConsulta()">🧹 Limpiar</button>
@@ -287,10 +314,7 @@
             </div>
         </div>
 
-        <!-- Ficha de Consulta en 3 Secciones con Colores Pasteles -->
         <div id="fichaConsultaCompleta" class="card" style="display: none;">
-            
-            <!-- Contadores de Equipos Asignados en Tonos Pasteles Suaves -->
             <div class="stat-grid-colored">
                 <div class="stat-card-colored" style="background: var(--pastel-total-bg); color: var(--pastel-total-text); border-color: var(--pastel-total-border);">
                     <span class="stat-label">Total Equipos</span>
@@ -310,45 +334,32 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN 1 (HORIZONTAL): DATOS DEL SERVIDOR -->
             <div class="person-horizontal-bar">
-                <div>
-                    <b>Servidor Responsable</b>
-                    <span id="fHorizNombre">-</span>
-                </div>
-                <div>
-                    <b>DNI Responsable</b>
-                    <span id="fHorizDni">-</span>
-                </div>
-                <div>
-                    <b>Gerencia / Órgano</b>
-                    <span id="fHorizGerencia">-</span>
-                </div>
-                <div>
-                    <b>Área / Dependencia</b>
-                    <span id="fHorizArea">-</span>
-                </div>
-                <div>
-                    <b>Sub-Área / Oficina</b>
-                    <span id="fHorizSubarea">-</span>
-                </div>
+                <div><b>Servidor Responsable</b><span id="fHorizNombre">-</span></div>
+                <div><b>DNI Responsable</b><span id="fHorizDni">-</span></div>
+                <div><b>Gerencia / Órgano</b><span id="fHorizGerencia">-</span></div>
+                <div><b>Área / Dependencia</b><span id="fHorizArea">-</span></div>
+                <div><b>Sub-Área / Oficina</b><span id="fHorizSubarea">-</span></div>
             </div>
 
-            <!-- Menú en Cascada de Selección de Bienes -->
             <div id="boxSelectorCascadaBienes" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label style="font-size: 11.5px; font-weight: 800; color: #1e3a8a;">EQUIPO ESPECÍFICO A REVISAR / EDITAR:</label>
-                <select id="selBienServidor" onchange="cambioBienSeleccionado()" style="flex: 1; min-width: 250px; padding: 7px 10px; font-size: 12.5px; font-weight: 700; border-radius: 6px; border: 1.5px solid #3b82f6;">
-                </select>
+                <select id="selBienServidor" onchange="cambioBienSeleccionado()" style="flex: 1; min-width: 220px; padding: 8px 10px; font-size: 12.5px; font-weight: 700; border-radius: 6px; border: 1.5px solid #3b82f6;"></select>
             </div>
 
-            <!-- SECCIÓN 2 Y 3 (2 COLUMNAS VERTICALES PROFESIONALES) -->
             <div class="two-columns-vertical">
-                
-                <!-- Columna Izquierda: Ficha Técnica (Editable si es consulta por código patrimonial) -->
+                <!-- Columna Izquierda: Ficha Técnica -->
                 <div class="vertical-pane">
                     <div class="pane-title">
                         <span>Ficha Técnica del Bien</span>
                         <span id="badgeEstadoEditable" style="font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 800;"></span>
+                    </div>
+
+                    <div class="edit-mode-toggle">
+                        <label>
+                            <input type="checkbox" id="chkEditarTodo" onchange="toggleEdicionTotal()">
+                            ✏️ Habilitar edición de todos los campos técnicos
+                        </label>
                     </div>
 
                     <div class="field-group">
@@ -385,14 +396,12 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Diagnóstico y Formulario de Reasignación -->
+                <!-- Columna Derecha: Gestión y Reasignación -->
                 <div class="vertical-pane">
                     <div class="pane-title">Gestión y Reasignación en Drive</div>
-                    
-                    <!-- Diagnóstico Técnico Semaforizado Pastel (3 Niveles) -->
+
                     <div id="fAiBox" class="ai-card"></div>
 
-                    <!-- Modalidad de Edición -->
                     <div id="boxModoEdicionOpciones" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
                         <label style="font-size: 11px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 6px;">MODALIDAD DE ACTUALIZACIÓN:</label>
                         <div style="display: flex; gap: 14px; flex-wrap: wrap;">
@@ -400,7 +409,7 @@
                                 <input type="radio" name="modoEdicion" id="optEditarSoloBien" value="SOLO_BIEN" checked onchange="cambioModoEdicion()"> Actualizar solo este bien
                             </label>
                             <label style="font-size: 11.5px; font-weight: 700; cursor: pointer; color: var(--accent);">
-                                <input type="radio" name="modoEdicion" id="optReasignarServidor" value="TODOS" onchange="cambioModoEdicion()"> Asignar a un NUEVO servidor (Afecta todos sus equipos)
+                                <input type="radio" name="modoEdicion" id="optReasignarServidor" value="TODOS" onchange="cambioModoEdicion()"> Asignar a NUEVO servidor (todos sus equipos)
                             </label>
                         </div>
                     </div>
@@ -432,46 +441,38 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MÓDULO 2: REPORTE POR ÁREA (EXCEL, CONTADOR TOTAL Y A4 VERTICAL LIMPIO)   -->
-    <!-- ========================================================================= -->
+    <!-- ================= MÓDULO 2 ================= -->
     <div id="modulo-reporte" class="modulo-content" style="display: none;">
         <div class="card">
-            <h2 style="font-size: 15px; margin-bottom: 12px; color: var(--primary);">Filtro Jerárquico por Dependencia</h2>
-            
+            <h2 style="font-size: clamp(14px, 2vw, 16px); margin-bottom: 12px; color: var(--primary);">Filtro Jerárquico por Dependencia</h2>
+
             <div class="filter-grid-4">
                 <div class="filter-group">
                     <label>1. GERENCIA / ÓRGANO:</label>
-                    <select id="m2Gerencia" onchange="m2CambioGerencia()">
-                        <option value="">-- Seleccione Gerencia --</option>
-                    </select>
+                    <select id="m2Gerencia" onchange="m2CambioGerencia()"><option value="">-- Seleccione Gerencia --</option></select>
                 </div>
                 <div class="filter-group">
                     <label>2. ÁREA / DEPENDENCIA:</label>
-                    <select id="m2Area" onchange="m2CambioArea()">
-                        <option value="">-- Todas las Áreas --</option>
-                    </select>
+                    <select id="m2Area" onchange="m2CambioArea()"><option value="">-- Todas las Áreas --</option></select>
                 </div>
                 <div class="filter-group">
                     <label>3. SUB-ÁREA / OFICINA:</label>
-                    <select id="m2SubArea" onchange="generarReporteModulo2()">
-                        <option value="">-- Todas las Subáreas --</option>
-                    </select>
+                    <select id="m2SubArea" onchange="generarReporteModulo2()"><option value="">-- Todas las Subáreas --</option></select>
                 </div>
             </div>
 
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <button class="btn btn-blue" onclick="generarReporteModulo2()">Visualizar Reporte</button>
-                <button class="btn btn-amber" onclick="descargarExcelModulo2()">📥 Descargar en Excel (.xlsx)</button>
-                <button class="btn btn-green" id="btnVistaPreviaM2" onclick="imprimirVistaPreviaReporteM2()" disabled>🖨️ Vista Previa A4 Vertical</button>
+                <button class="btn btn-amber" onclick="descargarExcelModulo2()">📥 Descargar Excel (.xlsx)</button>
+                <button class="btn btn-green" id="btnVistaPreviaM2" onclick="imprimirVistaPreviaReporteM2()" disabled>🖨️ Vista Previa A4</button>
                 <button class="btn btn-gray" onclick="limpiarReporteModulo2()">Limpiar Filtros</button>
             </div>
         </div>
 
         <div id="m2ContenedorReporte" class="card" style="display: none;">
             <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 10px;">
-                <h3 style="font-size: 14px; text-transform: uppercase;">Consolidado de Equipos de Cómputo por Dependencia</h3>
-                <p id="m2Metadatos" style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px;"></p>
+                <h3 style="font-size: clamp(13px, 1.8vw, 15px); text-transform: uppercase;">Consolidado de Equipos de Cómputo por Dependencia</h3>
+                <p id="m2Metadatos" style="font-size: clamp(10.5px, 1.3vw, 11.5px); color: var(--text-muted); margin-top: 3px;"></p>
             </div>
 
             <div class="table-responsive-box">
@@ -490,41 +491,31 @@
                 </table>
             </div>
 
-            <div id="m2Resumen" style="margin-top: 12px; font-size: 12px; font-weight: 700; color: #334155;"></div>
+            <div id="m2Resumen" style="margin-top: 12px; font-size: clamp(11px, 1.4vw, 12.5px); font-weight: 700; color: #334155;"></div>
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MÓDULO 3: ACTA OFICIAL A4 (MEDIDAS EXACTAS Y OBSERVACIONES)                -->
-    <!-- ========================================================================= -->
+    <!-- ================= MÓDULO 3 ================= -->
     <div id="modulo-acta" class="modulo-content" style="display: none;">
         <div class="card">
-            <h2 style="font-size: 15px; margin-bottom: 12px; color: var(--primary);">Configuración y Emisión de Acta Oficial</h2>
-            
+            <h2 style="font-size: clamp(14px, 2vw, 16px); margin-bottom: 12px; color: var(--primary);">Configuración y Emisión de Acta Oficial</h2>
+
             <div class="filter-grid-4">
                 <div class="filter-group">
                     <label>1. GERENCIA:</label>
-                    <select id="m3Gerencia" onchange="m3CambioGerencia()">
-                        <option value="">-- Seleccione Gerencia --</option>
-                    </select>
+                    <select id="m3Gerencia" onchange="m3CambioGerencia()"><option value="">-- Seleccione Gerencia --</option></select>
                 </div>
                 <div class="filter-group">
                     <label>2. ÁREA:</label>
-                    <select id="m3Area" onchange="m3CambioArea()">
-                        <option value="">-- Seleccione Área --</option>
-                    </select>
+                    <select id="m3Area" onchange="m3CambioArea()"><option value="">-- Seleccione Área --</option></select>
                 </div>
                 <div class="filter-group">
                     <label>3. SUB-ÁREA:</label>
-                    <select id="m3SubArea" onchange="m3CambioSubArea()">
-                        <option value="">-- Seleccione Subárea --</option>
-                    </select>
+                    <select id="m3SubArea" onchange="m3CambioSubArea()"><option value="">-- Seleccione Subárea --</option></select>
                 </div>
                 <div class="filter-group">
                     <label>4. SERVIDOR (RESPONSABLE):</label>
-                    <select id="m3Servidor" onchange="m3SeleccionarServidor()">
-                        <option value="">-- Seleccione Servidor --</option>
-                    </select>
+                    <select id="m3Servidor" onchange="m3SeleccionarServidor()"><option value="">-- Seleccione Servidor --</option></select>
                 </div>
             </div>
 
@@ -540,30 +531,23 @@
                 </div>
                 <div class="filter-group" style="grid-column: span 2;">
                     <label>6. CÓDIGO O SERIE A AÑADIR:</label>
-                    <div style="display: flex; gap: 6px;">
-                        <input type="text" id="m3InCodigoBien" placeholder="Ingresa código patrimonial o serie...">
-                        <button class="btn btn-blue" onclick="m3AgregarBienAlActa()">+ Añadir a Tabla</button>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <input type="text" id="m3InCodigoBien" placeholder="Ingresa código patrimonial o serie..." style="flex:1; min-width:160px;">
+                        <button class="btn btn-blue" onclick="m3AgregarBienAlActa()">+ Añadir</button>
                     </div>
                 </div>
             </div>
 
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
                 <button class="btn btn-blue" onclick="sincronizarDrive()">🔄 Sincronizar Drive</button>
-                <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa A4 (Imprimir / PDF)</button>
+                <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa A4 (PDF)</button>
                 <button class="btn btn-gray" onclick="m3LimpiarActa()">🧹 Limpiar Tabla</button>
             </div>
         </div>
 
-        <!-- Acta Oficial con Formato Exacto A4 -->
-
-<!-- Vista Previa A4 con Margen y Estructura Oficial -->
         <div id="actaPreviewDocumento" class="acta-a4-preview">
-            <!-- Encabezado con Logo Institucional -->
             <div class="acta-header">
-                <img class="acta-logo-img" 
-                     src="logo.png" 
-                     alt="Logo Ministerio de Desarrollo e Inclusión Social - Perú" 
-                     onerror="this.src='https://mijaelcode.github.io/inventario-midis/logo.png'">
+                <img class="acta-logo-img" src="logo.png" alt="Logo MIDIS" onerror="this.src='https://mijaelcode.github.io/inventario-midis/logo.png'">
             </div>
 
             <div class="acta-title">"ACTA DE DESPLAZAMIENTO DE EQUIPAMIENTO Y MATERIAL DE CÓMPUTO"</div>
@@ -579,13 +563,11 @@
                 </div>
             </div>
 
-            <!-- Cuerpo del Acta: Separado 1.5 cm a la tabla -->
             <div class="acta-body-text">
                 En la ciudad de Lima, <span id="actaFecha" class="inline-editable" contenteditable="true">25 Junio del 2026</span> mediante el presente documento el Ministerio de Desarrollo e Inclusión Social, a través de la Oficina General de Tecnologías de la Información, dirección en la Av. Paseo de la Republica 3101 – San Isidro, se realiza la <span id="actaAccionTxt" style="text-transform: uppercase;">ENTREGA</span> del siguiente dispositivo Informático a la Sra/Sr <span id="actaServidorNom" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span>.<br>
                 Quien labora en el/la <span id="actaServidorArea" class="inline-editable" contenteditable="true">PROCURADURIA PÚBLICA</span>.
             </div>
 
-            <!-- Tabla Oficial con Cuadro de Observaciones -->
             <table class="acta-table" id="tablaActaOficial">
                 <thead>
                     <tr>
@@ -609,42 +591,28 @@
                 </tbody>
             </table>
 
-            <!-- Frase de Cierre -->
             <div class="acta-closing">En fe de lo cual firman la presente acta en 02 (dos) ejemplares.</div>
 
-            <!-- Bloque de Firmas: Línea superior con salto de línea para nombres largos -->
             <div class="acta-signatures-box">
-                <!-- Columna Izquierda -->
                 <div class="sig-col">
                     <div class="sig-role-text" id="sigTituloIzq">ENTREGUÉ CONFORME</div>
                     <div class="sig-line-top"></div>
-                    <div class="sig-meta-line">
-                        <b>Nombre:</b> <span id="sigNomIzq" class="inline-editable" contenteditable="true">Mijael Rivera Lopez</span>
-                    </div>
-                    <div class="sig-meta-line">
-                        <b>DNI:</b> <span id="sigDniIzq" class="inline-editable" contenteditable="true">48100357</span>
-                    </div>
+                    <div class="sig-meta-line"><b>Nombre:</b> <span id="sigNomIzq" class="inline-editable" contenteditable="true">Mijael Rivera Lopez</span></div>
+                    <div class="sig-meta-line"><b>DNI:</b> <span id="sigDniIzq" class="inline-editable" contenteditable="true">48100357</span></div>
                 </div>
 
-                <!-- Columna Derecha -->
                 <div class="sig-col">
                     <div class="sig-role-text" id="sigTituloDer">RECIBÍ CONFORME</div>
                     <div class="sig-line-top"></div>
-                    <div class="sig-meta-line">
-                        <b>Nombre:</b> <span id="sigNomDer" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span>
-                    </div>
-                    <div class="sig-meta-line">
-                        <b>DNI:</b> <span id="sigDniDer" class="inline-editable" contenteditable="true">72953853</span>
-                    </div>
+                    <div class="sig-meta-line"><b>Nombre:</b> <span id="sigNomDer" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span></div>
+                    <div class="sig-meta-line"><b>DNI:</b> <span id="sigDniDer" class="inline-editable" contenteditable="true">72953853</span></div>
                 </div>
             </div>
 
-            <!-- Pie de Página Fijo en la Base de la Hoja -->
             <div class="acta-footer-note">
                 Nota: Marcar con una X en los recuadros según corresponda a la entrega o recepción de un bien Informático.
             </div>
         </div>
-
     </div>
 </div>
 
@@ -656,6 +624,7 @@
     let esModoCodigoPatrimonial = false;
     let urlScript = "https://script.google.com/macros/s/AKfycby8S3YlBr5BvtRswSaB8rYKCN1DUQSX9TvjuSlwJjy--GqBRUTzu0Ugj7BxiwwwV1ev8Q/exec";
     let modoActaActual = "ENTREGA";
+    let edicionTotalActiva = false;
 
     const normalizarDni = (v) => String(v || "").replace(/\.0$/, "").trim();
     const limpiarStr = (v) => String(v || "").replace(/\.0$/, "").trim();
@@ -675,7 +644,7 @@
     }
 
     // =========================================================================
-    // CONEXIÓN CON DRIVE Y AUTOCOMPLETADO
+    // CONEXIÓN CON DRIVE
     // =========================================================================
     async function sincronizarDrive(forzar = false) {
         const badge = document.getElementById("badgeConexion");
@@ -746,10 +715,12 @@
     }
 
     // =========================================================================
-    // MÓDULO 1: BÚSQUEDA Y DIAGNÓSTICO DE 3 NIVELES
+    // MÓDULO 1: BÚSQUEDA
     // =========================================================================
     function buscarPorPersona() {
         esModoCodigoPatrimonial = false;
+        edicionTotalActiva = false;
+        document.getElementById("chkEditarTodo").checked = false;
         const query = document.getElementById("inPersona").value.trim().toUpperCase();
         if (!query) { alert("Ingresa un DNI o Nombres y Apellidos."); return; }
 
@@ -771,6 +742,8 @@
 
     function buscarPorCodigo() {
         esModoCodigoPatrimonial = true;
+        edicionTotalActiva = true;
+        document.getElementById("chkEditarTodo").checked = true;
         const cod = limpiarStr(document.getElementById("inCod").value);
         if (!cod) { alert("Ingresa un código patrimonial."); return; }
 
@@ -787,7 +760,6 @@
     }
 
     function mostrarFichaServidor(servidor, listaBienes, bienForzado = null) {
-        // 1. Contadores Desagregados en Colores Pasteles Suaves
         let nCpu = 0, nMon = 0, nTec = 0;
         listaBienes.forEach(b => {
             const p = (b._pestana || "").toUpperCase();
@@ -801,14 +773,12 @@
         document.getElementById("cntMon").innerText = nMon;
         document.getElementById("cntTec").innerText = nTec;
 
-        // 2. Sección Horizontal de Datos del Servidor
         document.getElementById("fHorizNombre").innerText = servidor["USUARIO RESPONSABLE"] || "SIN ASIGNAR";
         document.getElementById("fHorizDni").innerText = normalizarDni(servidor["DNI"]) || "S/DNI";
         document.getElementById("fHorizGerencia").innerText = servidor["GERENCIA"] || "-";
         document.getElementById("fHorizArea").innerText = servidor["AREA"] || "-";
         document.getElementById("fHorizSubarea").innerText = servidor["SUBAREA"] || "-";
 
-        // 3. Menú en Cascada
         const selBien = document.getElementById("selBienServidor");
         const boxSelector = document.getElementById("boxSelectorCascadaBienes");
         selBien.innerHTML = "";
@@ -826,7 +796,6 @@
             if (idxF !== -1) selBien.selectedIndex = idxF;
         }
 
-        // Configuración si es búsqueda por Código Patrimonial o por Servidor
         const boxModo = document.getElementById("boxModoEdicionOpciones");
         if (esModoCodigoPatrimonial) {
             boxSelector.style.display = "none";
@@ -848,13 +817,21 @@
         document.getElementById("fichaConsultaCompleta").scrollIntoView({ behavior: 'smooth' });
     }
 
+    function toggleEdicionTotal() {
+        edicionTotalActiva = document.getElementById("chkEditarTodo").checked;
+        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecSpecs"];
+        camposTecnicos.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.disabled = !edicionTotalActiva;
+        });
+    }
+
     function cambioBienSeleccionado() {
         const selBien = document.getElementById("selBienServidor");
         const idx = parseInt(selBien.value || "0", 10);
         bienEnEdicion = equiposDelServidor[idx] || servidorActualSeleccionado;
         if (!bienEnEdicion) return;
 
-        // Ficha Técnica (Columna Izquierda)
         document.getElementById("tecCodigo").value = limpiarStr(bienEnEdicion["SBN_CONCILIADO"]);
         document.getElementById("tecDesc").value = bienEnEdicion["DESCRIPCION DEL BIEN"] || "";
         document.getElementById("tecMarca").value = bienEnEdicion["MARCA"] || "";
@@ -871,18 +848,14 @@
         ].filter(Boolean).join(" | ") || "";
         document.getElementById("tecSpecs").value = specs;
 
-        // Habilitar campos técnicos SOLO si se consultó por Código Patrimonial
-        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecSpecs"];
+        // Habilitar campos según checkbox de edición total
+        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecSpecs"];
         camposTecnicos.forEach(id => {
-            document.getElementById(id).disabled = !esModoCodigoPatrimonial;
+            const el = document.getElementById(id);
+            if (el) el.disabled = !edicionTotalActiva;
         });
 
-        // =====================================================================
-        // SEMÁFORO EXACTO:
-        // <= 4 AÑOS -> VERDE
-        // > 4 AÑOS Y <= 5 AÑOS -> AMARILLO
-        // > 5 AÑOS -> ROJO
-        // =====================================================================
+        // Semáforo
         const aiBox = document.getElementById("fAiBox");
         const strAnt = String(bienEnEdicion["ANTIGÜEDAD"] || "").toLowerCase();
         let anios = 0;
@@ -893,7 +866,7 @@
 
         if (anios <= 4.0) {
             aiBox.className = "ai-card verde";
-            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"] || "Menor a 4 años"}</b> (Rango $\\le$ 4 años). El equipo está en buen estado y operativo.`;
+            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"] || "Menor a 4 años"}</b> (Rango ≤ 4 años). El equipo está en buen estado y operativo.`;
         } else if (anios > 4.0 && anios <= 5.0) {
             aiBox.className = "ai-card amarillo";
             aiBox.innerHTML = `<b>🟡 DIAGNÓSTICO: REGULAR / ALERTA</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Entre 4 y 5 años). Próximo al fin de su vida útil estimada; programar revisión técnica.`;
@@ -902,7 +875,6 @@
             aiBox.innerHTML = `<b>🔴 DIAGNÓSTICO: OBSOLETO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Supera 5 años). El equipo cumplió su ciclo de vida; elegible prioritario para renovación IOARR.`;
         }
 
-        // Columna Derecha: Datos del Servidor
         document.getElementById("editDni").value = normalizarDni(bienEnEdicion["DNI"]);
         document.getElementById("editUsuario").value = bienEnEdicion["USUARIO RESPONSABLE"] || "";
         document.getElementById("editArea").value = bienEnEdicion["AREA"] || bienEnEdicion["GERENCIA"] || "";
@@ -916,6 +888,9 @@
         document.getElementById("editSubArea").disabled = !esReasignacionTotal;
     }
 
+    // =========================================================================
+    // GUARDAR CAMBIOS EN DRIVE (TODOS LOS CAMPOS)
+    // =========================================================================
     async function guardarCambios() {
         if (!bienEnEdicion || !urlScript) return;
 
@@ -925,11 +900,14 @@
         const nuevaArea = document.getElementById("editArea").value.trim();
         const nuevaSubArea = document.getElementById("editSubArea").value.trim();
 
-        // Datos técnicos capturados si se editó la ficha técnica
+        // Datos técnicos (siempre se capturan, se envían si están habilitados o si es modo código)
         const nuevaDesc = document.getElementById("tecDesc").value.trim();
         const nuevaMarca = document.getElementById("tecMarca").value.trim();
         const nuevoModelo = document.getElementById("tecModelo").value.trim();
         const nuevaSerie = document.getElementById("tecSerie").value.trim();
+        const nuevoAmbiente = document.getElementById("tecAmbiente").value.trim();
+        const nuevaAntiguedad = document.getElementById("tecAntiguedad").value.trim();
+        const nuevasSpecs = document.getElementById("tecSpecs").value.trim();
 
         const notice = document.getElementById("saveNotice");
         const btn = document.getElementById("btnSave");
@@ -946,10 +924,16 @@
             nuevaArea: nuevaArea,
             nuevaSubArea: nuevaSubArea,
             actualizarTodos: esTodos,
+            // Campos técnicos
             descripcion: nuevaDesc,
             marca: nuevaMarca,
             modelo: nuevoModelo,
-            serie: nuevaSerie
+            serie: nuevaSerie,
+            ambiente: nuevoAmbiente,
+            antiguedad: nuevaAntiguedad,
+            specs: nuevasSpecs,
+            // Flags para saber qué actualizar
+            actualizarTecnicos: edicionTotalActiva || esModoCodigoPatrimonial
         };
 
         try {
@@ -960,6 +944,7 @@
                 body: JSON.stringify(payload)
             });
 
+            // Actualizar localmente
             if (esTodos) {
                 const dniAnt = normalizarDni(bienEnEdicion["DNI"]);
                 inventario.forEach(r => {
@@ -973,20 +958,26 @@
             } else {
                 bienEnEdicion["USUARIO RESPONSABLE"] = nuevoUser;
                 bienEnEdicion["DNI"] = nuevoDni;
-                if (esModoCodigoPatrimonial) {
+                if (edicionTotalActiva || esModoCodigoPatrimonial) {
                     bienEnEdicion["DESCRIPCION DEL BIEN"] = nuevaDesc;
                     bienEnEdicion["MARCA"] = nuevaMarca;
                     bienEnEdicion["MODELO"] = nuevoModelo;
                     bienEnEdicion["SERIE"] = nuevaSerie;
+                    bienEnEdicion["AMBIENTE"] = nuevoAmbiente;
+                    bienEnEdicion["ANTIGÜEDAD"] = nuevaAntiguedad;
+                    // Specs se guardan como campos individuales si el script lo soporta
                 }
             }
 
-            notice.style.color = "var(--verde-text)";
+            notice.style.color = "#15803d";
             notice.innerText = "✅ ¡Actualizado exitosamente en Drive!";
             setTimeout(() => { notice.innerText = ""; }, 4000);
+
+            // Refrescar ficha
+            cambioBienSeleccionado();
         } catch (e) {
             console.error(e);
-            notice.style.color = "var(--rojo-text)";
+            notice.style.color = "#991b1b";
             notice.innerText = "❌ Error al guardar.";
         } finally {
             btn.disabled = false;
@@ -998,11 +989,13 @@
         document.getElementById("inCod").value = "";
         document.getElementById("fichaConsultaCompleta").style.display = "none";
         bienEnEdicion = null;
+        edicionTotalActiva = false;
+        document.getElementById("chkEditarTodo").checked = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // =========================================================================
-    // MÓDULO 2: REPORTE POR ÁREA (EXCEL, CONTADOR TOTAL Y A4 VERTICAL)
+    // MÓDULO 2
     // =========================================================================
     function inicializarFiltrosModulo2() {
         const selG = document.getElementById("m2Gerencia");
@@ -1148,7 +1141,7 @@
     }
 
     // =========================================================================
-    // MÓDULO 3: ACTA OFICIAL (SINCRONIZACIÓN Y ESPACIADOS EXACTOS)
+    // MÓDULO 3
     // =========================================================================
     function inicializarFiltrosModulo3() {
         const selG = document.getElementById("m3Gerencia");
@@ -1317,41 +1310,28 @@
     }
 
     // =========================================================================
-    // MOTOR DE VENTANA DE IMPRESIÓN DIRECTA
+    // MOTOR DE IMPRESIÓN
     // =========================================================================
     function abrirVentanaImpresion(contenidoHtml, estilosAdicionales = '') {
         const printWindow = window.open('', '_blank', 'width=950,height=850');
-        if (!printWindow) {
-            window.print();
-            return;
-        }
+        if (!printWindow) { window.print(); return; }
         printWindow.document.open();
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Documento Oficial - MIDIS 2026</title>
                 <style>
                     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
                     body { background: #fff; padding: 0; margin: 0; color: #000; }
                     @page { size: A4 portrait; margin: 0; }
-                   .acta-a4-preview {
-    width: 210mm;
-    height: 297mm;
-    max-height: 297mm;
-    box-sizing: border-box;
-    padding: 20mm 25mm 20mm 30mm;
-    background: #ffffff;
-    color: #000000;
-    margin: 10px auto;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10pt;
-    line-height: 1.35;
-    position: relative; /* Permite anclar el pie de página */
-    overflow: hidden;
-}
+                    .acta-a4-preview {
+                        width: 210mm; height: 297mm; max-height: 297mm; box-sizing: border-box;
+                        padding: 20mm 25mm 20mm 30mm; background: #fff; color: #000; margin: 0 auto;
+                        font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.35; position: relative; overflow: hidden;
+                    }
                     .acta-header { display: flex; align-items: center; margin-bottom: 1.0cm; }
                     .acta-logo-img { height: 42px; width: auto; object-fit: contain; }
                     .acta-title { text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
@@ -1369,32 +1349,20 @@
                     .sig-col { width: 44%; text-align: center; font-size: 9pt; }
                     .sig-role-text { font-weight: bold; text-transform: uppercase; margin-bottom: 4.5cm; }
                     .sig-line-top { border-top: 1px solid #000; padding-top: 4px; width: 90%; margin: 0 auto; }
-                    .sig-meta-line {
-    text-align: left;
-    width: 100%;
-    max-width: 255px;
-    line-height: 1.25;
-    font-size: 8.8pt;
-    white-space: normal; /* Salto de línea automático cuando el nombre sea largo */
-    word-break: break-word;
-    margin-bottom: 4px;
-}
-                    .acta-footer-note {position: absolute; bottom: 18mm; left: 30mm; right: 25mm; font-size: 8pt; color: #222; border-top: 0.5px solid #888; padding-top: 6px; text-align: left;}                 
-                    /* Tablas para Reporte Módulo 2 */
+                    .sig-meta-line { text-align: left; width: 100%; max-width: 255px; line-height: 1.25; font-size: 8.8pt; white-space: normal; word-break: break-word; margin-bottom: 4px; }
+                    .acta-footer-note { position: absolute; bottom: 18mm; left: 30mm; right: 25mm; font-size: 8pt; color: #222; border-top: 0.5px solid #888; padding-top: 6px; text-align: left; }
                     .clean-report-table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 10px; }
                     .clean-report-table th { background: #1e293b; color: white; padding: 6px 8px; text-align: left; border: 1px solid #334155; }
                     .clean-report-table td { padding: 6px 8px; border: 1px solid #cbd5e1; vertical-align: top; }
                     .device-card-item { border: 1px solid #94a3b8; padding: 3px 5px; margin-bottom: 3px; font-size: 8pt; }
+                    @media print { .acta-a4-preview { box-shadow: none; margin: 0; } }
                     ${estilosAdicionales}
                 </style>
             </head>
             <body>
                 ${contenidoHtml}
                 <script>
-                    window.onload = function() {
-                        window.focus();
-                        window.print();
-                    };
+                    window.onload = function() { window.focus(); window.print(); };
                 <\/script>
             </body>
             </html>
