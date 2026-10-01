@@ -74,6 +74,8 @@
         .badge-status { font-size: clamp(10px, 1.4vw, 11.5px); font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block; white-space: nowrap; }
         .badge-wait { background: #fee2e2; color: #b91c1c; }
         .badge-ok { background: #dcfce7; color: #15803d; }
+        .badge-loading { background: #fef3c7; color: #b45309; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         /* ===== NAV MÓDULOS ===== */
         .nav-modules {
@@ -157,6 +159,7 @@
         .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
         .input-control:disabled { background: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
         .input-control:not(:disabled):hover { border-color: #94a3b8; }
+        .input-control.modified { border-color: #f59e0b; background: #fffbeb; }
 
         /* ===== SEMÁFORO ===== */
         .ai-card { padding: clamp(10px, 1.6vw, 13px) clamp(11px, 1.8vw, 15px); border-radius: var(--radius-sm); font-size: clamp(11px, 1.4vw, 12.5px); line-height: 1.5; border: 1.5px solid; margin-bottom: 12px; }
@@ -184,6 +187,9 @@
         .device-card-item { background: #fff; border: 1px solid #cbd5e1; border-left: 3px solid var(--accent); padding: 4px 6px; border-radius: 4px; font-size: clamp(10px, 1.2vw, 11px); margin-bottom: 4px; }
         .device-card-item b { font-family: 'JetBrains Mono', monospace; color: #1e293b; }
 
+        .empty-state { text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
+        .empty-state .icon { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
         /* ===== ACTA A4 ===== */
         .acta-a4-preview {
             width: 210mm; min-height: 297mm; box-sizing: border-box; padding: 22mm 25mm 20mm 30mm; background: #fff; color: #000; margin: 10px auto; box-shadow: var(--shadow-lg); font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.35; position: relative;
@@ -201,6 +207,7 @@
         .acta-table th, .acta-table td { border: 1px solid #000; padding: 5px 4px; text-align: center; }
         .acta-table th { background: #fff; font-weight: bold; }
         .acta-table td:nth-child(2) { text-align: left; padding-left: 6px; }
+        .acta-table td[contenteditable="true"]:hover { background: #fef9c3; cursor: text; }
         .acta-closing { font-size: 9.8pt; margin-bottom: 10px; }
         .acta-signatures-box { display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 35px; padding: 0 10px; flex-wrap: wrap; gap: 20px; }
         .sig-col { width: 44%; text-align: center; font-size: 9pt; min-width: 220px; }
@@ -225,6 +232,26 @@
         .edit-mode-toggle label { font-size: 11.5px; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .edit-mode-toggle input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
 
+        /* ===== TOAST NOTIFICACIONES ===== */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
+        .toast {
+            background: #fff; border-radius: var(--radius-md); padding: 14px 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border-left: 5px solid;
+            font-size: 13px; font-weight: 600; animation: slideIn 0.3s ease;
+        }
+        .toast.success { border-left-color: #16a34a; color: #065f46; background: #ecfdf5; }
+        .toast.error { border-left-color: #dc2626; color: #991b1b; background: #fef2f2; }
+        .toast.warning { border-left-color: #f59e0b; color: #92400e; background: #fffbeb; }
+        .toast.info { border-left-color: #2563eb; color: #1e40af; background: #eff6ff; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle;
+        }
+        .spinner-dark { border: 2px solid rgba(37,99,235,0.2); border-top-color: var(--accent); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* ===== RESPONSIVE MÓVIL ===== */
         @media (max-width: 640px) {
             body { padding: 6px 4px; }
@@ -245,6 +272,7 @@
             .acta-body-text { font-size: 8.5pt; }
             .acta-table { font-size: 8pt; }
             .sig-role-text { margin-bottom: 2cm; }
+            .toast-container { top: 10px; right: 10px; left: 10px; max-width: none; }
         }
 
         @media (max-width: 400px) {
@@ -268,9 +296,22 @@
         .mb-10 { margin-bottom: 10px; }
         .text-center { text-align: center; }
         .hidden { display: none !important; }
+
+        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-box {
+            background: #fff; border-radius: var(--radius-lg); padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: fadeIn 0.2s ease;
+        }
+        .modal-box h3 { font-size: 16px; color: var(--primary); margin-bottom: 10px; }
+        .modal-box p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
     </style>
 </head>
 <body>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="container">
     <div class="header">
@@ -391,8 +432,20 @@
                         <input type="text" id="tecAntiguedad" class="input-control" disabled style="font-weight:700;">
                     </div>
                     <div class="field-group">
-                        <label>Especificaciones Técnicas / Conectividad:</label>
-                        <input type="text" id="tecSpecs" class="input-control" disabled>
+                        <label>Procesador:</label>
+                        <input type="text" id="tecProcesador" class="input-control" disabled placeholder="Ej: Intel Core i5-1145G7">
+                    </div>
+                    <div class="field-group">
+                        <label>Memoria RAM:</label>
+                        <input type="text" id="tecRam" class="input-control" disabled placeholder="Ej: 16 GB DDR4">
+                    </div>
+                    <div class="field-group">
+                        <label>Disco Duro / SSD:</label>
+                        <input type="text" id="tecDisco" class="input-control" disabled placeholder="Ej: SSD 512 GB">
+                    </div>
+                    <div class="field-group">
+                        <label>Dirección IP:</label>
+                        <input type="text" id="tecIp" class="input-control" disabled placeholder="Ej: 192.168.1.100" style="font-family:'JetBrains Mono', monospace;">
                     </div>
                 </div>
 
@@ -416,19 +469,19 @@
 
                     <div class="field-group">
                         <label>DNI del Servidor:</label>
-                        <input type="text" id="editDni" class="input-control">
+                        <input type="text" id="editDni" class="input-control" maxlength="15">
                     </div>
                     <div class="field-group">
                         <label>Nombres y Apellidos del Servidor:</label>
-                        <input type="text" id="editUsuario" class="input-control">
+                        <input type="text" id="editUsuario" class="input-control" maxlength="120">
                     </div>
                     <div class="field-group">
                         <label>Área / Dependencia:</label>
-                        <input type="text" id="editArea" class="input-control">
+                        <input type="text" id="editArea" class="input-control" maxlength="150">
                     </div>
                     <div class="field-group">
                         <label>Sub-Área / Oficina:</label>
-                        <input type="text" id="editSubArea" class="input-control">
+                        <input type="text" id="editSubArea" class="input-control" maxlength="150">
                     </div>
 
                     <div style="margin-top: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -539,7 +592,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
-                <button class="btn btn-blue" onclick="sincronizarDrive()">🔄 Sincronizar Drive</button>
+                <button class="btn btn-blue" onclick="sincronizarDrive(true)">🔄 Sincronizar Drive</button>
                 <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa A4 (PDF)</button>
                 <button class="btn btn-gray" onclick="m3LimpiarActa()">🧹 Limpiar Tabla</button>
             </div>
@@ -579,16 +632,7 @@
                         <th style="width: 15%;">Observaciones</th>
                     </tr>
                 </thead>
-                <tbody id="actaTableBody">
-                    <tr>
-                        <td>01</td>
-                        <td contenteditable="true">UNIDAD CENTRAL DE PROCESO - CPU LENOVO THINKCENTRE M70S GEN5</td>
-                        <td contenteditable="true">1</td>
-                        <td contenteditable="true">GMOWZ2S2</td>
-                        <td contenteditable="true">740899501756</td>
-                        <td contenteditable="true">OPERATIVO</td>
-                    </tr>
-                </tbody>
+                <tbody id="actaTableBody"></tbody>
             </table>
 
             <div class="acta-closing">En fe de lo cual firman la presente acta en 02 (dos) ejemplares.</div>
@@ -617,18 +661,81 @@
 </div>
 
 <script>
+    // =========================================================================
+    // CONFIGURACIÓN Y ESTADO GLOBAL
+    // =========================================================================
+    const CONFIG = {
+        urlScript: "https://script.google.com/macros/s/AKfycby8S3YlBr5BvtRswSaB8rYKCN1DUQSX9TvjuSlwJjy--GqBRUTzu0Ugj7BxiwwwV1ev8Q/exec",
+        timeoutMs: 25000,
+        cacheKey: "midis_inventario_cache",
+        cacheTTL: 5 * 60 * 1000 // 5 minutos
+    };
+
     let inventario = [];
     let servidorActualSeleccionado = null;
     let equiposDelServidor = [];
     let bienEnEdicion = null;
     let esModoCodigoPatrimonial = false;
-    let urlScript = "https://script.google.com/macros/s/AKfycby8S3YlBr5BvtRswSaB8rYKCN1DUQSX9TvjuSlwJjy--GqBRUTzu0Ugj7BxiwwwV1ev8Q/exec";
     let modoActaActual = "ENTREGA";
     let edicionTotalActiva = false;
+    let datosReporteModulo2Cache = [];
+    let camposOriginales = {};
 
+    // =========================================================================
+    // UTILIDADES
+    // =========================================================================
     const normalizarDni = (v) => String(v || "").replace(/\.0$/, "").trim();
     const limpiarStr = (v) => String(v || "").replace(/\.0$/, "").trim();
 
+    function mostrarToast(mensaje, tipo = "info", duracion = 4000) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = `toast ${tipo}`;
+        toast.textContent = mensaje;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = "slideOut 0.3s ease forwards";
+            setTimeout(() => toast.remove(), 300);
+        }, duracion);
+    }
+
+    function confirmar(mensaje, titulo = "¿Confirmar acción?") {
+        return new Promise(resolve => {
+            const overlay = document.createElement("div");
+            overlay.className = "modal-overlay";
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>${titulo}</h3>
+                    <p>${mensaje}</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-gray" id="modalCancel">Cancelar</button>
+                        <button class="btn btn-blue" id="modalOk">Confirmar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.querySelector("#modalOk").onclick = () => { overlay.remove(); resolve(true); };
+            overlay.querySelector("#modalCancel").onclick = () => { overlay.remove(); resolve(false); };
+        });
+    }
+
+    async function fetchConTimeout(url, options = {}) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), CONFIG.timeoutMs);
+        try {
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timeoutId);
+            return res;
+        } catch (e) {
+            clearTimeout(timeoutId);
+            if (e.name === "AbortError") throw new Error("Tiempo de espera agotado. Verifica tu conexión.");
+            throw e;
+        }
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN
+    // =========================================================================
     function cambiarModulo(id, btn) {
         document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.modulo-content').forEach(m => m.style.display = 'none');
@@ -644,32 +751,97 @@
     }
 
     // =========================================================================
-    // CONEXIÓN CON DRIVE
+    // SINCRONIZACIÓN CON DRIVE
     // =========================================================================
     async function sincronizarDrive(forzar = false) {
         const badge = document.getElementById("badgeConexion");
-        badge.className = "badge-status badge-wait";
-        badge.innerText = "⏳ Sincronizando con Drive...";
+        badge.className = "badge-status badge-loading";
+        badge.innerHTML = '<span class="spinner"></span> Sincronizando con Drive...';
+
+        // Intentar cargar desde caché si no se fuerza
+        if (!forzar) {
+            try {
+                const cacheRaw = localStorage.getItem(CONFIG.cacheKey);
+                if (cacheRaw) {
+                    const cache = JSON.parse(cacheRaw);
+                    if (Date.now() - cache.timestamp < CONFIG.cacheTTL && Array.isArray(cache.data) && cache.data.length > 0) {
+                        inventario = cache.data;
+                        badge.className = "badge-status badge-ok";
+                        badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes (caché)`;
+                        cargarListasAutocompletado();
+                        inicializarFiltrosModulo2();
+                        inicializarFiltrosModulo3();
+                        return true;
+                    }
+                }
+            } catch (e) { /* caché corrupto, ignorar */ }
+        }
 
         try {
-            const fetchUrl = forzar ? (urlScript + (urlScript.includes("?") ? "&" : "?") + "refresh=1&_t=" + Date.now()) : urlScript;
-            const res = await fetch(fetchUrl, { method: "GET", redirect: "follow" });
+            const fetchUrl = forzar
+                ? (CONFIG.urlScript + (CONFIG.urlScript.includes("?") ? "&" : "?") + "refresh=1&_t=" + Date.now())
+                : CONFIG.urlScript;
+
+            const res = await fetchConTimeout(fetchUrl, { method: "GET", redirect: "follow" });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
 
-            if (Array.isArray(data) && data.length > 0) {
-                inventario = data;
-                badge.className = "badge-status badge-ok";
-                badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
+            if (data && data.error) throw new Error(data.error);
 
-                cargarListasAutocompletado();
-                inicializarFiltrosModulo2();
-                inicializarFiltrosModulo3();
-                return true;
+            // Aceptar tanto array directo como {success, data}
+            let lista = [];
+            if (Array.isArray(data)) {
+                lista = data;
+            } else if (data && Array.isArray(data.data)) {
+                lista = data.data;
+            } else {
+                throw new Error("Estructura de respuesta no reconocida.");
             }
+
+            if (lista.length === 0) {
+                throw new Error("El inventario está vacío o el formato es incorrecto.");
+            }
+
+            inventario = lista;
+
+            // Guardar en caché
+            try {
+                localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
+                    timestamp: Date.now(),
+                    data: inventario
+                }));
+            } catch (e) { /* localStorage lleno, ignorar */ }
+
+            badge.className = "badge-status badge-ok";
+            badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
+            mostrarToast(`Inventario cargado: ${inventario.length} bienes`, "success");
+
+            cargarListasAutocompletado();
+            inicializarFiltrosModulo2();
+            inicializarFiltrosModulo3();
+            return true;
         } catch (e) {
-            console.error(e);
+            console.error("[sincronizarDrive]", e);
             badge.className = "badge-status badge-wait";
             badge.innerText = "❌ Error de conexión con Drive";
+            mostrarToast(`Error al sincronizar: ${e.message}`, "error", 6000);
+
+            // Intentar cargar caché vieja como fallback
+            try {
+                const cacheRaw = localStorage.getItem(CONFIG.cacheKey);
+                if (cacheRaw) {
+                    const cache = JSON.parse(cacheRaw);
+                    if (Array.isArray(cache.data) && cache.data.length > 0) {
+                        inventario = cache.data;
+                        badge.className = "badge-status badge-wait";
+                        badge.innerText = `⚠️ Drive offline - usando caché (${inventario.length} bienes)`;
+                        cargarListasAutocompletado();
+                        inicializarFiltrosModulo2();
+                        inicializarFiltrosModulo3();
+                    }
+                }
+            } catch (e2) { /* sin caché, todo falla */ }
+            return false;
         }
     }
 
@@ -678,14 +850,28 @@
 
         const elemNomTexto = document.getElementById("actaServidorNom");
         if (elemNomTexto) {
-            elemNomTexto.addEventListener("input", function() {
-                const nuevoNom = this.innerText.trim();
+            elemNomTexto.addEventListener("input", function () {
+                const nuevoNom = this.textContent.trim();
                 if (modoActaActual === "ENTREGA") {
-                    document.getElementById("sigNomDer").innerText = nuevoNom;
+                    document.getElementById("sigNomDer").textContent = nuevoNom;
                 } else {
-                    document.getElementById("sigNomIzq").innerText = nuevoNom;
+                    document.getElementById("sigNomIzq").textContent = nuevoNom;
                 }
             });
+        }
+
+        document.querySelectorAll(".input-control").forEach(input => {
+            input.addEventListener("input", function () {
+                this.classList.toggle("modified", true);
+            });
+        });
+    });
+
+    window.addEventListener("beforeunload", (e) => {
+        const hayCambios = Object.values(camposOriginales).some(v => v === false);
+        if (Object.keys(camposOriginales).length > 0) {
+            e.preventDefault();
+            e.returnValue = "";
         }
     });
 
@@ -721,21 +907,35 @@
         esModoCodigoPatrimonial = false;
         edicionTotalActiva = false;
         document.getElementById("chkEditarTodo").checked = false;
-        const query = document.getElementById("inPersona").value.trim().toUpperCase();
-        if (!query) { alert("Ingresa un DNI o Nombres y Apellidos."); return; }
+        const queryRaw = document.getElementById("inPersona").value.trim().toUpperCase();
+        if (!queryRaw) { mostrarToast("Ingresa un DNI o Nombres y Apellidos.", "warning"); return; }
+
+        let queryLimpio = queryRaw;
+        const dniMatch = queryRaw.match(/\(DNI:\s*([^)]+)\)/);
+        let dniQuery = "";
+        if (dniMatch) {
+            dniQuery = dniMatch[1].trim();
+            queryLimpio = queryRaw.replace(/\s*\(DNI:[^)]+\)/, "").trim();
+        } else if (/^\d{7,}$/.test(queryRaw.replace(/\s/g, ""))) {
+            dniQuery = queryRaw.replace(/\s/g, "");
+        }
 
         let coincidencia = inventario.filter(r => {
             const dni = normalizarDni(r["DNI"]);
             const nom = (r["USUARIO RESPONSABLE"] || "").toUpperCase();
-            return (dni && query.includes(dni)) || nom.includes(query) || (dni && dni === query);
+            if (dniQuery) return dni === dniQuery;
+            return nom.includes(queryLimpio);
         });
 
         if (!coincidencia.length) {
-            alert("No se encontraron bienes asignados a este servidor.");
+            mostrarToast("No se encontraron bienes asignados a este servidor.", "warning");
             return;
         }
 
-        servidorActualSeleccionado = coincidencia[0];
+        const matchExacto = coincidencia.find(r =>
+            (r["USUARIO RESPONSABLE"] || "").toUpperCase() === queryLimpio
+        );
+        servidorActualSeleccionado = matchExacto || coincidencia[0];
         equiposDelServidor = coincidencia;
         mostrarFichaServidor(servidorActualSeleccionado, equiposDelServidor);
     }
@@ -745,14 +945,17 @@
         edicionTotalActiva = true;
         document.getElementById("chkEditarTodo").checked = true;
         const cod = limpiarStr(document.getElementById("inCod").value);
-        if (!cod) { alert("Ingresa un código patrimonial."); return; }
+        if (!cod) { mostrarToast("Ingresa un código patrimonial.", "warning"); return; }
 
         const bien = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === cod);
-        if (!bien) { alert(`No se encontró el bien con código: ${cod}`); return; }
+        if (!bien) { mostrarToast(`No se encontró el bien con código: ${cod}`, "error"); return; }
 
         const dni = normalizarDni(bien["DNI"]);
         const nom = (bien["USUARIO RESPONSABLE"] || "").trim();
-        equiposDelServidor = inventario.filter(r => (dni && normalizarDni(r["DNI"]) === dni) || (nom && r["USUARIO RESPONSABLE"] === nom));
+        equiposDelServidor = inventario.filter(r =>
+            (dni && normalizarDni(r["DNI"]) === dni) ||
+            (!dni && nom && r["USUARIO RESPONSABLE"] === nom)
+        );
         if (!equiposDelServidor.length) equiposDelServidor = [bien];
 
         servidorActualSeleccionado = bien;
@@ -797,20 +1000,24 @@
         }
 
         const boxModo = document.getElementById("boxModoEdicionOpciones");
+        const badge = document.getElementById("badgeEstadoEditable");
         if (esModoCodigoPatrimonial) {
             boxSelector.style.display = "none";
             boxModo.style.display = "none";
             document.getElementById("optEditarSoloBien").checked = true;
-            document.getElementById("badgeEstadoEditable").innerText = "EDICIÓN TÉCNICA HABILITADA";
-            document.getElementById("badgeEstadoEditable").style.background = "#dbeafe";
-            document.getElementById("badgeEstadoEditable").style.color = "#0369a1";
+            badge.innerText = "EDICIÓN TÉCNICA HABILITADA";
+            badge.style.background = "#dbeafe";
+            badge.style.color = "#0369a1";
         } else {
             boxSelector.style.display = "flex";
             boxModo.style.display = "block";
-            document.getElementById("badgeEstadoEditable").innerText = "MODO CONSULTA";
-            document.getElementById("badgeEstadoEditable").style.background = "#f1f5f9";
-            document.getElementById("badgeEstadoEditable").style.color = "#475569";
+            badge.innerText = "MODO CONSULTA";
+            badge.style.background = "#f1f5f9";
+            badge.style.color = "#475569";
         }
+
+        camposOriginales = {};
+        document.querySelectorAll(".input-control").forEach(i => i.classList.remove("modified"));
 
         cambioBienSeleccionado();
         document.getElementById("fichaConsultaCompleta").style.display = "block";
@@ -819,7 +1026,7 @@
 
     function toggleEdicionTotal() {
         edicionTotalActiva = document.getElementById("chkEditarTodo").checked;
-        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecSpecs"];
+        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecProcesador", "tecRam", "tecDisco", "tecIp"];
         camposTecnicos.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.disabled = !edicionTotalActiva;
@@ -830,43 +1037,46 @@
         const selBien = document.getElementById("selBienServidor");
         const idx = parseInt(selBien.value || "0", 10);
         bienEnEdicion = equiposDelServidor[idx] || servidorActualSeleccionado;
-        if (!bienEnEdicion) return;
+        if (!bienEnEdicion) {
+            ["tecCodigo","tecDesc","tecMarca","tecModelo","tecSerie","tecAmbiente","tecAntiguedad","tecProcesador","tecRam","tecDisco","tecIp","editDni","editUsuario","editArea","editSubArea"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = "";
+            });
+            return;
+        }
 
         document.getElementById("tecCodigo").value = limpiarStr(bienEnEdicion["SBN_CONCILIADO"]);
         document.getElementById("tecDesc").value = bienEnEdicion["DESCRIPCION DEL BIEN"] || "";
         document.getElementById("tecMarca").value = bienEnEdicion["MARCA"] || "";
         document.getElementById("tecModelo").value = bienEnEdicion["MODELO"] || "";
         document.getElementById("tecSerie").value = bienEnEdicion["SERIE"] || "";
-        document.getElementById("tecAmbiente").value = `${bienEnEdicion["SEDE"] || ""} / ${bienEnEdicion["AMBIENTE"] || ""}`.trim();
+        document.getElementById("tecAmbiente").value = `${bienEnEdicion["SEDE"] || ""} / ${bienEnEdicion["AMBIENTE"] || ""}`.trim().replace(/^\/\s*/, "");
         document.getElementById("tecAntiguedad").value = bienEnEdicion["ANTIGÜEDAD"] || "No registrada";
+        document.getElementById("tecProcesador").value = bienEnEdicion["PROCESADOR"] || "";
+        document.getElementById("tecRam").value = bienEnEdicion["RAM"] || "";
+        document.getElementById("tecDisco").value = bienEnEdicion["DISCO DURO"] || "";
+        document.getElementById("tecIp").value = bienEnEdicion["IP"] || "";
 
-        const specs = [
-            bienEnEdicion["PROCESADOR"] ? `CPU: ${bienEnEdicion["PROCESADOR"]}` : '',
-            bienEnEdicion["RAM"] ? `RAM: ${bienEnEdicion["RAM"]}` : '',
-            bienEnEdicion["DISCO DURO"] ? `Disco: ${bienEnEdicion["DISCO DURO"]}` : '',
-            bienEnEdicion["IP"] ? `IP: ${bienEnEdicion["IP"]}` : ''
-        ].filter(Boolean).join(" | ") || "";
-        document.getElementById("tecSpecs").value = specs;
-
-        // Habilitar campos según checkbox de edición total
-        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecSpecs"];
+        const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecProcesador", "tecRam", "tecDisco", "tecIp"];
         camposTecnicos.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.disabled = !edicionTotalActiva;
         });
 
-        // Semáforo
         const aiBox = document.getElementById("fAiBox");
         const strAnt = String(bienEnEdicion["ANTIGÜEDAD"] || "").toLowerCase();
         let anios = 0;
-        const match = strAnt.match(/(\d+)\s*año/);
-        if (match) anios = parseInt(match[1], 10);
+        const match = strAnt.match(/(\d+(?:\.\d+)?)\s*año/);
+        if (match) anios = parseFloat(match[1]);
         else if (strAnt.includes("mes") && !strAnt.includes("año")) anios = 0;
         else anios = parseFloat(strAnt.replace(/[^\d.]/g, '')) || 0;
 
-        if (anios <= 4.0) {
+        if (!strAnt || strAnt === "no registrada") {
+            aiBox.className = "ai-card amarillo";
+            aiBox.innerHTML = `<b>🟡 ANTIGÜEDAD NO REGISTRADA</b><br>No se puede determinar el estado del equipo. Se recomienda registrar la fecha de adquisición.`;
+        } else if (anios <= 4.0) {
             aiBox.className = "ai-card verde";
-            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"] || "Menor a 4 años"}</b> (Rango ≤ 4 años). El equipo está en buen estado y operativo.`;
+            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Rango ≤ 4 años). El equipo está en buen estado y operativo.`;
         } else if (anios > 4.0 && anios <= 5.0) {
             aiBox.className = "ai-card amarillo";
             aiBox.innerHTML = `<b>🟡 DIAGNÓSTICO: REGULAR / ALERTA</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Entre 4 y 5 años). Próximo al fin de su vida útil estimada; programar revisión técnica.`;
@@ -880,6 +1090,8 @@
         document.getElementById("editArea").value = bienEnEdicion["AREA"] || bienEnEdicion["GERENCIA"] || "";
         document.getElementById("editSubArea").value = bienEnEdicion["SUBAREA"] || "";
         cambioModoEdicion();
+
+        document.querySelectorAll(".input-control").forEach(i => i.classList.remove("modified"));
     }
 
     function cambioModoEdicion() {
@@ -889,10 +1101,11 @@
     }
 
     // =========================================================================
-    // GUARDAR CAMBIOS EN DRIVE (TODOS LOS CAMPOS)
+    // GUARDAR CAMBIOS EN DRIVE
     // =========================================================================
     async function guardarCambios() {
-        if (!bienEnEdicion || !urlScript) return;
+        if (!bienEnEdicion) { mostrarToast("No hay bien seleccionado para guardar.", "warning"); return; }
+        if (!CONFIG.urlScript) { mostrarToast("URL del script no configurada.", "error"); return; }
 
         const esTodos = document.getElementById("optReasignarServidor").checked && !esModoCodigoPatrimonial;
         const nuevoDni = normalizarDni(document.getElementById("editDni").value);
@@ -900,21 +1113,36 @@
         const nuevaArea = document.getElementById("editArea").value.trim();
         const nuevaSubArea = document.getElementById("editSubArea").value.trim();
 
-        // Datos técnicos (siempre se capturan, se envían si están habilitados o si es modo código)
-        const nuevaDesc = document.getElementById("tecDesc").value.trim();
-        const nuevaMarca = document.getElementById("tecMarca").value.trim();
-        const nuevoModelo = document.getElementById("tecModelo").value.trim();
-        const nuevaSerie = document.getElementById("tecSerie").value.trim();
-        const nuevoAmbiente = document.getElementById("tecAmbiente").value.trim();
-        const nuevaAntiguedad = document.getElementById("tecAntiguedad").value.trim();
-        const nuevasSpecs = document.getElementById("tecSpecs").value.trim();
+        if (esTodos && !nuevoDni) {
+            mostrarToast("Para reasignar todos los equipos, el DNI del nuevo servidor es obligatorio.", "error");
+            return;
+        }
+        if (esTodos && !nuevoUser) {
+            mostrarToast("Para reasignar todos los equipos, el nombre del nuevo servidor es obligatorio.", "error");
+            return;
+        }
+        if (nuevoDni && !/^\d{7,15}$/.test(nuevoDni)) {
+            mostrarToast("El DNI debe contener solo números (7 a 15 dígitos).", "error");
+            return;
+        }
+
+        if (esTodos) {
+            const ok = await confirmar(
+                `Se actualizarán TODOS los equipos asignados al DNI ${normalizarDni(bienEnEdicion["DNI"])} y se reasignarán a "${nuevoUser}" (DNI: ${nuevoDni}). ¿Continuar?`,
+                "⚠️ Reasignación Masiva"
+            );
+            if (!ok) return;
+        }
 
         const notice = document.getElementById("saveNotice");
         const btn = document.getElementById("btnSave");
 
         btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Guardando...';
         notice.style.color = "var(--accent)";
-        notice.innerText = "⏳ Guardando cambios en Drive...";
+        notice.innerText = "Guardando cambios...";
+
+        const actualizarTecnicos = edicionTotalActiva || esModoCodigoPatrimonial;
 
         const payload = {
             codigo: limpiarStr(bienEnEdicion["SBN_CONCILIADO"]),
@@ -924,27 +1152,39 @@
             nuevaArea: nuevaArea,
             nuevaSubArea: nuevaSubArea,
             actualizarTodos: esTodos,
-            // Campos técnicos
-            descripcion: nuevaDesc,
-            marca: nuevaMarca,
-            modelo: nuevoModelo,
-            serie: nuevaSerie,
-            ambiente: nuevoAmbiente,
-            antiguedad: nuevaAntiguedad,
-            specs: nuevasSpecs,
-            // Flags para saber qué actualizar
-            actualizarTecnicos: edicionTotalActiva || esModoCodigoPatrimonial
+            actualizarTecnicos: actualizarTecnicos,
+            descripcion: actualizarTecnicos ? document.getElementById("tecDesc").value.trim() : "",
+            marca: actualizarTecnicos ? document.getElementById("tecMarca").value.trim() : "",
+            modelo: actualizarTecnicos ? document.getElementById("tecModelo").value.trim() : "",
+            serie: actualizarTecnicos ? document.getElementById("tecSerie").value.trim() : "",
+            ambiente: actualizarTecnicos ? document.getElementById("tecAmbiente").value.trim() : "",
+            antiguedad: actualizarTecnicos ? document.getElementById("tecAntiguedad").value.trim() : "",
+            procesador: actualizarTecnicos ? document.getElementById("tecProcesador").value.trim() : "",
+            ram: actualizarTecnicos ? document.getElementById("tecRam").value.trim() : "",
+            discoDuro: actualizarTecnicos ? document.getElementById("tecDisco").value.trim() : "",
+            ip: actualizarTecnicos ? document.getElementById("tecIp").value.trim() : ""
         };
 
         try {
-            await fetch(urlScript, {
+            const res = await fetchConTimeout(CONFIG.urlScript, {
                 method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload),
+                redirect: "follow"
             });
 
-            // Actualizar localmente
+            let data;
+            try {
+                const texto = await res.text();
+                data = JSON.parse(texto);
+            } catch (e) {
+                throw new Error("Respuesta inválida del servidor. Verifica la implementación del Web App.");
+            }
+
+            if (!data.success) {
+                throw new Error(data.error || "Error desconocido del servidor");
+            }
+
             if (esTodos) {
                 const dniAnt = normalizarDni(bienEnEdicion["DNI"]);
                 inventario.forEach(r => {
@@ -955,32 +1195,49 @@
                         r["SUBAREA"] = nuevaSubArea;
                     }
                 });
+                mostrarToast(`✅ ${data.actualizados} equipo(s) reasignado(s) exitosamente.`, "success");
             } else {
                 bienEnEdicion["USUARIO RESPONSABLE"] = nuevoUser;
                 bienEnEdicion["DNI"] = nuevoDni;
-                if (edicionTotalActiva || esModoCodigoPatrimonial) {
-                    bienEnEdicion["DESCRIPCION DEL BIEN"] = nuevaDesc;
-                    bienEnEdicion["MARCA"] = nuevaMarca;
-                    bienEnEdicion["MODELO"] = nuevoModelo;
-                    bienEnEdicion["SERIE"] = nuevaSerie;
-                    bienEnEdicion["AMBIENTE"] = nuevoAmbiente;
-                    bienEnEdicion["ANTIGÜEDAD"] = nuevaAntiguedad;
-                    // Specs se guardan como campos individuales si el script lo soporta
+                bienEnEdicion["AREA"] = nuevaArea;
+                bienEnEdicion["SUBAREA"] = nuevaSubArea;
+
+                if (actualizarTecnicos) {
+                    bienEnEdicion["DESCRIPCION DEL BIEN"] = payload.descripcion;
+                    bienEnEdicion["MARCA"] = payload.marca;
+                    bienEnEdicion["MODELO"] = payload.modelo;
+                    bienEnEdicion["SERIE"] = payload.serie;
+                    bienEnEdicion["AMBIENTE"] = payload.ambiente;
+                    bienEnEdicion["ANTIGÜEDAD"] = payload.antiguedad;
+                    bienEnEdicion["PROCESADOR"] = payload.procesador;
+                    bienEnEdicion["RAM"] = payload.ram;
+                    bienEnEdicion["DISCO DURO"] = payload.discoDuro;
+                    bienEnEdicion["IP"] = payload.ip;
                 }
+                mostrarToast(`✅ Bien actualizado correctamente.`, "success");
             }
+
+            try {
+                localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
+                    timestamp: Date.now(),
+                    data: inventario
+                }));
+            } catch (e) { /* ignorar */ }
 
             notice.style.color = "#15803d";
             notice.innerText = "✅ ¡Actualizado exitosamente en Drive!";
-            setTimeout(() => { notice.innerText = ""; }, 4000);
 
-            // Refrescar ficha
             cambioBienSeleccionado();
+
+            setTimeout(() => { notice.innerText = ""; }, 4000);
         } catch (e) {
-            console.error(e);
+            console.error("[guardarCambios]", e);
             notice.style.color = "#991b1b";
-            notice.innerText = "❌ Error al guardar.";
+            notice.innerText = "❌ " + e.message;
+            mostrarToast(`Error al guardar: ${e.message}`, "error", 6000);
         } finally {
             btn.disabled = false;
+            btn.innerHTML = '💾 Guardar en Google Drive';
         }
     }
 
@@ -991,6 +1248,7 @@
         bienEnEdicion = null;
         edicionTotalActiva = false;
         document.getElementById("chkEditarTodo").checked = false;
+        camposOriginales = {};
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1040,8 +1298,6 @@
         generarReporteModulo2();
     }
 
-    let datosReporteModulo2Cache = [];
-
     function generarReporteModulo2() {
         const ger = document.getElementById("m2Gerencia").value;
         const area = document.getElementById("m2Area").value;
@@ -1081,6 +1337,14 @@
         let c = 1;
         datosReporteModulo2Cache = [];
 
+        if (mapU.size === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><span class="icon">📭</span>No se encontraron equipos con los filtros seleccionados.</td></tr>`;
+            document.getElementById("m2Resumen").innerText = "Total Servidores: 0 | Total Bienes: 0";
+            cont.style.display = "block";
+            btnV.disabled = true;
+            return;
+        }
+
         mapU.forEach(u => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -1112,13 +1376,14 @@
 
     function descargarExcelModulo2() {
         if (!datosReporteModulo2Cache.length) {
-            alert("Primero selecciona una Gerencia para generar los datos del reporte.");
+            mostrarToast("Primero selecciona una Gerencia para generar los datos del reporte.", "warning");
             return;
         }
         const ws = XLSX.utils.json_to_sheet(datosReporteModulo2Cache);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Consolidado_TIC");
         XLSX.writeFile(wb, `Reporte_Equipos_${Date.now()}.xlsx`);
+        mostrarToast("Excel descargado correctamente.", "success");
     }
 
     function imprimirVistaPreviaReporteM2() {
@@ -1222,22 +1487,22 @@
         const dni = opt.dataset.dni || "";
         const area = document.getElementById("m3Area").value || document.getElementById("m3Gerencia").value;
 
-        document.getElementById("actaServidorNom").innerText = nom;
-        document.getElementById("actaServidorArea").innerText = area;
+        document.getElementById("actaServidorNom").textContent = nom;
+        document.getElementById("actaServidorArea").textContent = area;
 
         if (modoActaActual === "ENTREGA") {
-            document.getElementById("sigNomDer").innerText = nom;
-            document.getElementById("sigDniDer").innerText = dni;
+            document.getElementById("sigNomDer").textContent = nom;
+            document.getElementById("sigDniDer").textContent = dni;
         } else {
-            document.getElementById("sigNomIzq").innerText = nom;
-            document.getElementById("sigDniIzq").innerText = dni;
+            document.getElementById("sigNomIzq").textContent = nom;
+            document.getElementById("sigDniIzq").textContent = dni;
         }
     }
 
     function m3AgregarBienAlActa() {
         const tipoBien = document.getElementById("m3TipoBien").value;
         const query = limpiarStr(document.getElementById("m3InCodigoBien").value);
-        if (!query) { alert("Ingresa un código patrimonial o número de serie."); return; }
+        if (!query) { mostrarToast("Ingresa un código patrimonial o número de serie.", "warning"); return; }
 
         const bien = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === query || limpiarStr(r["SERIE"]) === query);
         let detalle = "", serie = "-", codigo = query;
@@ -1247,11 +1512,21 @@
             serie = bien["SERIE"] || "-";
             codigo = limpiarStr(bien["SBN_CONCILIADO"]);
         } else {
-            detalle = `${tipoBien} (REGISTRO)`;
+            detalle = `${tipoBien} (REGISTRO MANUAL)`;
             serie = query;
         }
 
         const tbody = document.getElementById("actaTableBody");
+
+        const codigosExistentes = Array.from(tbody.querySelectorAll("tr")).map(tr => {
+            const tds = tr.querySelectorAll("td");
+            return tds[4] ? tds[4].textContent.trim() : "";
+        });
+        if (codigosExistentes.includes(codigo)) {
+            mostrarToast(`El código ${codigo} ya está en la tabla.`, "warning");
+            return;
+        }
+
         const nro = String(tbody.rows.length + 1).padStart(2, '0');
 
         const tr = document.createElement("tr");
@@ -1265,6 +1540,7 @@
         `;
         tbody.appendChild(tr);
         document.getElementById("m3InCodigoBien").value = "";
+        mostrarToast(`Bien agregado al acta: ${codigo}`, "success", 2500);
     }
 
     function alternarModoActa(modo) {
@@ -1281,26 +1557,27 @@
         const nomDer = document.getElementById("sigNomDer");
         const dniDer = document.getElementById("sigDniDer");
 
-        const servidorNom = document.getElementById("actaServidorNom").innerText.trim();
+        const servidorNom = document.getElementById("actaServidorNom").textContent.trim();
         const selServ = document.getElementById("m3Servidor");
-        const servidorDni = (selServ.options[selServ.selectedIndex] ? selServ.options[selServ.selectedIndex].dataset.dni : "") || document.getElementById("sigDniDer").innerText.trim();
+        const servidorDni = (selServ.options[selServ.selectedIndex] ? selServ.options[selServ.selectedIndex].dataset.dni : "") || document.getElementById("sigDniDer").textContent.trim();
 
         const ogtiNom = "Mijael Rivera Lopez";
         const ogtiDni = "48100357";
 
         if (modo === "ENTREGA") {
             boxEnt.innerText = "X"; boxRec.innerHTML = "&nbsp;"; txtAccion.innerText = "ENTREGA";
-            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.innerText = ogtiNom; dniIzq.innerText = ogtiDni;
-            titDer.innerText = "RECIBÍ CONFORME"; nomDer.innerText = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniDer.innerText = servidorDni || "72953853";
+            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.textContent = ogtiNom; dniIzq.textContent = ogtiDni;
+            titDer.innerText = "RECIBÍ CONFORME"; nomDer.textContent = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniDer.textContent = servidorDni || "72953853";
         } else {
             boxEnt.innerHTML = "&nbsp;"; boxRec.innerText = "X"; txtAccion.innerText = "RECEPCIÓN";
-            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.innerText = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniIzq.innerText = servidorDni || "72953853";
-            titDer.innerText = "RECIBÍ CONFORME"; nomDer.innerText = ogtiNom; dniDer.innerText = ogtiDni;
+            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.textContent = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniIzq.textContent = servidorDni || "72953853";
+            titDer.innerText = "RECIBÍ CONFORME"; nomDer.textContent = ogtiNom; dniDer.textContent = ogtiDni;
         }
     }
 
     function m3LimpiarActa() {
         document.getElementById("actaTableBody").innerHTML = "";
+        mostrarToast("Tabla del acta limpiada.", "info", 2000);
     }
 
     function imprimirVistaPreviaActa() {
@@ -1314,7 +1591,10 @@
     // =========================================================================
     function abrirVentanaImpresion(contenidoHtml, estilosAdicionales = '') {
         const printWindow = window.open('', '_blank', 'width=950,height=850');
-        if (!printWindow) { window.print(); return; }
+        if (!printWindow) {
+            mostrarToast("Permite las ventanas emergentes para imprimir.", "warning");
+            return;
+        }
         printWindow.document.open();
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -1362,7 +1642,11 @@
             <body>
                 ${contenidoHtml}
                 <script>
-                    window.onload = function() { window.focus(); window.print(); };
+                    window.onload = function() {
+                        window.focus();
+                        setTimeout(function() { window.print(); }, 300);
+                    };
+                    window.onafterprint = function() { setTimeout(function() { window.close(); }, 500); };
                 <\/script>
             </body>
             </html>
@@ -1370,6 +1654,9 @@
         printWindow.document.close();
     }
 
+    // =========================================================================
+    // EVENT LISTENERS
+    // =========================================================================
     document.getElementById("inPersona").addEventListener("keyup", e => { if (e.key === "Enter") buscarPorPersona(); });
     document.getElementById("inCod").addEventListener("keyup", e => { if (e.key === "Enter") buscarPorCodigo(); });
     document.getElementById("m3InCodigoBien").addEventListener("keyup", e => { if (e.key === "Enter") m3AgregarBienAlActa(); });
