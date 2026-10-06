@@ -6,7 +6,6 @@
     <title>Sistema de Gestión Patrimonial TIC - MIDIS 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -69,6 +68,7 @@
         }
         .header-title h1 { font-size: clamp(15px, 2.2vw, 19px); font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; }
         .header-title p { font-size: clamp(11px, 1.6vw, 13px); opacity: 0.85; margin-top: 4px; }
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
         /* ===== BADGES ===== */
         .badge-status { font-size: clamp(10px, 1.4vw, 11.5px); font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block; white-space: nowrap; }
@@ -104,6 +104,7 @@
         .btn-green { background: #16a34a; color: #fff; }
         .btn-gray { background: #e2e8f0; color: #334155; }
         .btn-amber { background: #d97706; color: #fff; }
+        .btn-purple { background: #7c3aed; color: #fff; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* ===== TABS ===== */
@@ -190,6 +191,267 @@
         .empty-state { text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 13px; font-weight: 600; }
         .empty-state .icon { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
 
+        /* ===== TARJETAS ANALÍTICAS MÓDULO 2 ===== */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .analytics-card {
+            background: linear-gradient(160deg, #ffffff 0%, #f8fbff 100%);
+            border: 1.5px solid #d7e1ee;
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: 0 6px 20px rgba(30, 64, 100, .07);
+            transition: var(--transition);
+        }
+        .analytics-card:hover {
+            box-shadow: 0 10px 28px rgba(30, 64, 100, .12);
+            transform: translateY(-2px);
+        }
+        .analytics-card h4 {
+            font-size: clamp(12px, 1.5vw, 13.5px);
+            font-weight: 800;
+            color: #123b72;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .analytics-card h4 .ac-total {
+            font-family: 'JetBrains Mono', monospace;
+            background: #123b72;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .brand-rows { display: flex; flex-direction: column; gap: 8px; }
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        .brand-row:hover { border-color: #bfdbfe; background: #f0f9ff; }
+        .brand-dot {
+            width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+        .brand-name {
+            flex: 1; font-size: 12.5px; font-weight: 700; color: #334155;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .brand-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800; font-size: 14px; color: #0f172a;
+            min-width: 40px; text-align: right;
+        }
+        .brand-bar {
+            width: 70px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; flex-shrink: 0;
+        }
+        .brand-bar > div { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+        .brand-subtotal {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1;
+            font-size: 11.5px; font-weight: 700; color: #52647a;
+        }
+        .brand-subtotal span:last-child { font-family: 'JetBrains Mono', monospace; color: #0f172a; font-size: 13px; }
+
+        .age-detail { font-size: 11px; color: #52647a; line-height: 1.5; }
+
+        /* ===== TARJETA TOTALES POR TIPO ===== */
+        .type-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .type-block {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            grid-template-rows: auto auto;
+            align-items: center;
+            column-gap: 12px;
+            row-gap: 2px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .type-block::after {
+            content: "→";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%) translateX(8px);
+            font-size: 18px;
+            font-weight: 800;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .type-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+        }
+        .type-block:hover::after {
+            opacity: .6;
+            transform: translateY(-50%) translateX(0);
+        }
+        .type-block:active { transform: translateY(0); }
+        .type-block:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, .35);
+            outline-offset: 2px;
+        }
+
+        .type-block .tb-icon {
+            grid-row: 1 / span 2;
+            font-size: 28px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .type-block .tb-label {
+            font-size: 11.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            opacity: .9;
+        }
+        .type-block .tb-num {
+            grid-row: 1 / span 2;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 26px;
+            font-weight: 800;
+            text-align: right;
+            padding-right: 18px;
+        }
+        .type-block .tb-hint {
+            font-size: 10px;
+            font-weight: 600;
+            opacity: .7;
+        }
+
+        .type-block.cpu      { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #60a5fa; color: #1e40af; }
+        .type-block.cpu:hover      { border-color: #2563eb; }
+        .type-block.monitor  { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #34d399; color: #065f46; }
+        .type-block.monitor:hover  { border-color: #10b981; }
+        .type-block.teclado  { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fbbf24; color: #92400e; }
+        .type-block.teclado:hover  { border-color: #f59e0b; }
+
+        /* ===== MODAL MARCAS ===== */
+        .modal-marcas-box {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, .3);
+            animation: fadeIn 0.25s ease;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-marcas-box h3 {
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-marcas-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+        .modal-marcas-list {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+            margin-bottom: 14px;
+        }
+        .modal-marca-row {
+            display: grid;
+            grid-template-columns: 14px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        .modal-marca-row:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .modal-marca-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(0,0,0,.04);
+        }
+        .modal-marca-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .modal-marca-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 15px;
+            color: #0f172a;
+            background: #e2e8f0;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .modal-marca-bar {
+            grid-column: 2 / 4;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .modal-marca-bar > div {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .5s ease;
+        }
+        .modal-marcas-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 12px;
+            font-weight: 700;
+            color: #52647a;
+        }
+        .modal-marcas-footer span:last-child {
+            font-family: 'JetBrains Mono', monospace;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
         /* ===== ACTA A4 ===== */
         .acta-a4-preview {
             width: 210mm; min-height: 297mm; box-sizing: border-box; padding: 22mm 25mm 20mm 30mm; background: #fff; color: #000; margin: 10px auto; box-shadow: var(--shadow-lg); font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.35; position: relative;
@@ -216,7 +478,6 @@
         .sig-meta-line { text-align: left; width: 100%; max-width: 255px; line-height: 1.25; font-size: 8.8pt; white-space: normal; word-break: break-word; margin-bottom: 4px; }
         .acta-footer-note { position: absolute; bottom: 18mm; left: 30mm; right: 25mm; font-size: 8pt; color: #222; border-top: 0.5px solid #888; padding-top: 6px; text-align: left; }
 
-        /* ===== RESPONSIVE ACTA ===== */
         @media (max-width: 850px) {
             .acta-a4-preview { width: 100%; min-height: auto; padding: 15px; font-size: 9pt; }
             .acta-signatures-box { flex-direction: column; align-items: center; }
@@ -225,14 +486,14 @@
             .acta-footer-note { position: static; margin-top: 20px; }
         }
 
-        /* ===== MODO EDICIÓN AVANZADO ===== */
+        /* ===== MODO EDICIÓN ===== */
         .edit-mode-toggle {
             display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; border: 1px solid #cbd5e1;
         }
         .edit-mode-toggle label { font-size: 11.5px; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .edit-mode-toggle input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
 
-        /* ===== TOAST NOTIFICACIONES ===== */
+        /* ===== TOAST ===== */
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
         .toast {
             background: #fff; border-radius: var(--radius-md); padding: 14px 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border-left: 5px solid;
@@ -249,55 +510,9 @@
         .spinner {
             display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle;
         }
-        .spinner-dark { border: 2px solid rgba(37,99,235,0.2); border-top-color: var(--accent); }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== RESPONSIVE MÓVIL ===== */
-        @media (max-width: 640px) {
-            body { padding: 6px 4px; }
-            .header { flex-direction: column; text-align: center; }
-            .nav-modules { flex-wrap: nowrap; }
-            .mod-btn { min-width: 150px; font-size: 11px; padding: 8px 6px; }
-            .tab-btn { min-width: 140px; }
-            .search-box-custom { flex-direction: column; }
-            .search-input-field { min-width: 100%; }
-            .stat-grid-colored { grid-template-columns: repeat(2, 1fr); }
-            .person-horizontal-bar { grid-template-columns: 1fr; }
-            .filter-grid-4 { grid-template-columns: 1fr; }
-            .btn { width: 100%; justify-content: center; }
-            .two-columns-vertical { gap: 10px; }
-            .pane-title { font-size: 12px; }
-            .acta-a4-preview { padding: 12px; font-size: 8.5pt; }
-            .acta-title { font-size: 9pt; }
-            .acta-body-text { font-size: 8.5pt; }
-            .acta-table { font-size: 8pt; }
-            .sig-role-text { margin-bottom: 2cm; }
-            .toast-container { top: 10px; right: 10px; left: 10px; max-width: none; }
-        }
-
-        @media (max-width: 400px) {
-            .stat-grid-colored { grid-template-columns: 1fr; }
-            .mod-btn { min-width: 120px; font-size: 10px; }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* ===== ANIMACIONES ===== */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .modulo-content, .card, .fichaConsultaCompleta { animation: fadeIn 0.3s ease; }
-
-        /* ===== UTILIDADES ===== */
-        .flex-wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        .mt-10 { margin-top: 10px; }
-        .mb-10 { margin-bottom: 10px; }
-        .text-center { text-align: center; }
-        .hidden { display: none !important; }
-
-        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(3px); z-index: 9998; display: flex; align-items: center; justify-content: center; padding: 20px;
         }
@@ -307,415 +522,110 @@
         .modal-box h3 { font-size: 16px; color: var(--primary); margin-bottom: 10px; }
         .modal-box p { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-    
-        /* =========================================================
-           REDISEÑO RESPONSIVO 2026
-           - Pantalla completa
-           - Navegación móvil sin saturación de títulos
-           - Formularios y paneles con colores modernos
-           - Mejor uso del ancho disponible
-           ========================================================= */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        html, body {
-            width: 100%;
-            min-width: 0;
-        }
+        /* ===== REDISEÑO RESPONSIVO ===== */
+        html, body { width: 100%; min-width: 0; }
+        body { margin: 0; padding: 0; background: radial-gradient(circle at 0% 0%, rgba(59,130,246,.08), transparent 28%), linear-gradient(180deg, #f4f7fb 0%, #eef3f8 100%); }
+        .container { width: 100%; max-width: none; min-height: 100vh; padding: clamp(8px, 1.2vw, 18px); }
+        .header { width: 100%; background: linear-gradient(135deg, #0b1f3a 0%, #123b72 52%, #1769aa 100%); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 10px 30px rgba(15, 35, 65, .16); }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background:
-                radial-gradient(circle at 0% 0%, rgba(59,130,246,.08), transparent 28%),
-                linear-gradient(180deg, #f4f7fb 0%, #eef3f8 100%);
-        }
-
-        .container {
-            width: 100%;
-            max-width: none;
-            min-height: 100vh;
-            padding: clamp(8px, 1.2vw, 18px);
-        }
-
-        .header {
-            width: 100%;
-            background: linear-gradient(135deg, #0b1f3a 0%, #123b72 52%, #1769aa 100%);
-            border: 1px solid rgba(255,255,255,.14);
-            box-shadow: 0 10px 30px rgba(15, 35, 65, .16);
-        }
-
-        .header-title h1 {
-            letter-spacing: -.45px;
-        }
-
-        /* Navegación de módulos: en PC ocupa todo el ancho; en móvil
-           cada opción se adapta y muestra una etiqueta corta. */
         .nav-modules {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 7px;
-            margin-bottom: 14px;
-            padding: 6px;
-            background: linear-gradient(135deg, #dbeafe, #e0e7ff);
-            border: 1px solid #c7d2fe;
-            box-shadow: 0 5px 18px rgba(30, 64, 175, .08);
-            overflow: visible;
+            width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 14px; padding: 6px; background: linear-gradient(135deg, #dbeafe, #e0e7ff); border: 1px solid #c7d2fe; box-shadow: 0 5px 18px rgba(30, 64, 175, .08); overflow: visible;
         }
-
-        .mod-btn {
-            min-width: 0;
-            width: 100%;
-            min-height: 46px;
-            padding: 9px 10px;
-            color: #475569;
-            background: rgba(255,255,255,.58);
-            border: 1px solid transparent;
-            white-space: normal;
-            line-height: 1.25;
-            overflow-wrap: anywhere;
-        }
-
-        .mod-btn:hover {
-            color: #1d4ed8;
-            background: #fff;
-        }
-
-        .mod-btn.active {
-            color: #fff;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            border-color: #1d4ed8;
-            box-shadow: 0 5px 14px rgba(37,99,235,.25);
-        }
-
+        .mod-btn { min-width: 0; width: 100%; min-height: 46px; padding: 9px 10px; color: #475569; background: rgba(255,255,255,.58); border: 1px solid transparent; white-space: normal; line-height: 1.25; overflow-wrap: anywhere; }
+        .mod-btn:hover { color: #1d4ed8; background: #fff; }
+        .mod-btn.active { color: #fff; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: #1d4ed8; box-shadow: 0 5px 14px rgba(37,99,235,.25); }
         .mod-short { display: none; }
 
-        /* Tarjetas y paneles */
-        .card {
-            border: 1px solid #d7e1ee;
-            background: rgba(255,255,255,.96);
-            box-shadow: 0 7px 24px rgba(30, 64, 100, .07);
-        }
+        .card { border: 1px solid #d7e1ee; background: rgba(255,255,255,.96); box-shadow: 0 7px 24px rgba(30, 64, 100, .07); }
+        .vertical-pane { border-color: #d7e1ee; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); }
+        .pane-title { color: #123b72; border-bottom-color: #dbeafe; }
 
-        .vertical-pane {
-            border-color: #d7e1ee;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-        }
-
-        .pane-title {
-            color: #123b72;
-            border-bottom-color: #dbeafe;
-        }
-
-        /* Formularios */
-        .search-box-custom,
-        #boxSelectorCascadaBienes,
-        #boxModoEdicionOpciones,
-        .edit-mode-toggle {
+        .search-box-custom, #boxSelectorCascadaBienes, #boxModoEdicionOpciones, .edit-mode-toggle {
             background: linear-gradient(135deg, #f0f7ff, #f8fbff) !important;
             border-color: #bfdbfe !important;
         }
-
-        .search-input-field,
-        .input-control,
-        .filter-group select,
-        .filter-group input,
-        #selBienServidor {
-            border-color: #b8c9dc;
-            background: #fff;
-            color: #172033;
-            box-shadow: 0 1px 2px rgba(15,23,42,.03);
+        .search-input-field, .input-control, .filter-group select, .filter-group input, #selBienServidor {
+            border-color: #b8c9dc; background: #fff; color: #172033; box-shadow: 0 1px 2px rgba(15,23,42,.03);
         }
-
-        .search-input-field:focus,
-        .input-control:focus,
-        .filter-group select:focus,
-        .filter-group input:focus,
-        #selBienServidor:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+        .search-input-field:focus, .input-control:focus, .filter-group select:focus, .filter-group input:focus, #selBienServidor:focus {
+            border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.12);
         }
+        .field-group label, .filter-group label { color: #52647a; }
+        .input-control:not(:disabled):hover, .filter-group select:hover, .filter-group input:hover { border-color: #7aa2ce; }
+        .input-control.modified { border-color: #f59e0b; background: #fffaf0; }
 
-        .field-group label,
-        .filter-group label {
-            color: #52647a;
-        }
+        .btn { min-height: 40px; border-radius: 9px; box-shadow: 0 2px 5px rgba(15,23,42,.08); }
+        .btn-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .btn-green { background: linear-gradient(135deg, #16a34a, #15803d); }
+        .btn-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .btn-gray { background: #e8eef6; color: #334155; border: 1px solid #d3deeb; }
 
-        .input-control:not(:disabled):hover,
-        .filter-group select:hover,
-        .filter-group input:hover {
-            border-color: #7aa2ce;
-        }
+        .stat-card-colored { box-shadow: 0 4px 12px rgba(30,64,175,.06); }
+        .person-horizontal-bar { background: linear-gradient(135deg, #eff6ff, #f8fbff); border-color: #bfdbfe; }
 
-        .input-control.modified {
-            border-color: #f59e0b;
-            background: #fffaf0;
-        }
+        .clean-report-table th { background: linear-gradient(135deg, #163b67, #1e5b91); }
+        .clean-report-table tr:nth-child(even) { background: #f5f9fd; }
 
-        /* Botones */
-        .btn {
-            min-height: 40px;
-            border-radius: 9px;
-            box-shadow: 0 2px 5px rgba(15,23,42,.08);
-        }
+        .header-title, .card, .vertical-pane, .field-group, .filter-group, .pane-title, .person-horizontal-bar div { min-width: 0; }
 
-        .btn-blue {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-        }
-
-        .btn-amber {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .btn-gray {
-            background: #e8eef6;
-            color: #334155;
-            border: 1px solid #d3deeb;
-        }
-
-        /* Estadísticas */
-        .stat-card-colored {
-            box-shadow: 0 4px 12px rgba(30,64,175,.06);
-        }
-
-        .person-horizontal-bar {
-            background: linear-gradient(135deg, #eff6ff, #f8fbff);
-            border-color: #bfdbfe;
-        }
-
-        /* Reportes */
-        .clean-report-table th {
-            background: linear-gradient(135deg, #163b67, #1e5b91);
-        }
-
-        .clean-report-table tr:nth-child(even) {
-            background: #f5f9fd;
-        }
-
-        /* Evita desbordes horizontales por textos largos */
-        .header-title,
-        .card,
-        .vertical-pane,
-        .field-group,
-        .filter-group,
-        .pane-title,
-        .person-horizontal-bar div {
-            min-width: 0;
-        }
-
-        /* Tablet */
         @media (max-width: 900px) {
             .container { padding: 8px; }
-
-            .nav-modules {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-
-            .mod-btn {
-                font-size: 11px;
-                padding: 8px 6px;
-            }
+            .nav-modules { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .mod-btn { font-size: 11px; padding: 8px 6px; }
+            .analytics-grid { grid-template-columns: 1fr; }
         }
 
-        /* Celular */
         @media (max-width: 640px) {
-            body {
-                padding: 0;
-            }
-
-            .container {
-                padding: 5px;
-            }
-
-            .header {
-                border-radius: 12px;
-                padding: 14px 12px;
-                margin-bottom: 8px;
-                gap: 8px;
-            }
-
-            .header-title h1 {
-                font-size: clamp(14px, 4vw, 18px);
-                line-height: 1.25;
-            }
-
-            .header-title p {
-                font-size: 10.5px;
-                line-height: 1.4;
-            }
-
-            .badge-status {
-                max-width: 100%;
-                white-space: normal;
-                text-align: center;
-                line-height: 1.25;
-            }
-
-            .nav-modules {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 4px;
-                padding: 4px;
-                border-radius: 10px;
-            }
-
-            .mod-btn {
-                min-height: 44px;
-                padding: 7px 4px;
-                font-size: 10px;
-                line-height: 1.15;
-            }
-
+            body { padding: 0; }
+            .container { padding: 5px; }
+            .header { border-radius: 12px; padding: 14px 12px; margin-bottom: 8px; gap: 8px; }
+            .header-title h1 { font-size: clamp(14px, 4vw, 18px); line-height: 1.25; }
+            .header-title p { font-size: 10.5px; line-height: 1.4; }
+            .badge-status { max-width: 100%; white-space: normal; text-align: center; line-height: 1.25; }
+            .nav-modules { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 10px; }
+            .mod-btn { min-height: 44px; padding: 7px 4px; font-size: 10px; line-height: 1.15; }
             .mod-full { display: none; }
-            .mod-short {
-                display: inline-block;
-                white-space: normal;
-            }
-
-            .card {
-                padding: 11px;
-                margin-bottom: 10px;
-                border-radius: 12px;
-            }
-
-            .tab-nav {
-                gap: 4px;
-            }
-
-            .tab-btn {
-                min-width: 0;
-                flex: 1 1 50%;
-                white-space: normal;
-                line-height: 1.2;
-                padding: 9px 6px;
-            }
-
-            .search-box-custom {
-                padding: 9px;
-            }
-
-            .search-input-field {
-                min-width: 0;
-                width: 100%;
-            }
-
-            .btn {
-                width: 100%;
-                min-height: 42px;
-                white-space: normal;
-                line-height: 1.2;
-            }
-
-            .stat-grid-colored {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 7px;
-            }
-
-            .stat-card-colored {
-                min-width: 0;
-            }
-
-            .stat-card-colored .stat-label {
-                overflow-wrap: anywhere;
-            }
-
-            .person-horizontal-bar {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-grid-4 {
-                grid-template-columns: 1fr;
-            }
-
-            .two-columns-vertical {
-                grid-template-columns: 1fr;
-                gap: 9px;
-            }
-
-            .pane-title {
-                font-size: 11px;
-                line-height: 1.3;
-            }
-
-            .edit-mode-toggle label {
-                line-height: 1.35;
-            }
-
-            .acta-a4-preview {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: auto;
-            }
-
-            /* Los controles inline del módulo 3 se apilan */
-            #modulo-acta input[type="text"] {
-                min-width: 0 !important;
-                width: 100%;
-            }
-
-            #modulo-acta .filter-grid-4 > .filter-group[style*="span 2"] {
-                grid-column: auto !important;
-            }
-
-            /* Tablas: se conserva scroll horizontal solo donde hace falta */
-            .table-responsive-box {
-                overflow-x: auto;
-                max-width: 100%;
-            }
-
-            .toast-container {
-                top: 8px;
-                right: 8px;
-                left: 8px;
-            }
+            .mod-short { display: inline-block; white-space: normal; }
+            .card { padding: 11px; margin-bottom: 10px; border-radius: 12px; }
+            .tab-nav { gap: 4px; }
+            .tab-btn { min-width: 0; flex: 1 1 50%; white-space: normal; line-height: 1.2; padding: 9px 6px; }
+            .search-box-custom { padding: 9px; }
+            .search-input-field { min-width: 0; width: 100%; }
+            .btn { width: 100%; min-height: 42px; white-space: normal; line-height: 1.2; }
+            .stat-grid-colored { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+            .stat-card-colored { min-width: 0; }
+            .stat-card-colored .stat-label { overflow-wrap: anywhere; }
+            .person-horizontal-bar { grid-template-columns: 1fr; }
+            .filter-grid-4 { grid-template-columns: 1fr; }
+            .two-columns-vertical { grid-template-columns: 1fr; gap: 9px; }
+            .pane-title { font-size: 11px; line-height: 1.3; }
+            .edit-mode-toggle label { line-height: 1.35; }
+            .acta-a4-preview { width: 100%; max-width: 100%; overflow-x: auto; }
+            #modulo-acta input[type="text"] { min-width: 0 !important; width: 100%; }
+            #modulo-acta .filter-grid-4 > .filter-group[style*="span 2"] { grid-column: auto !important; }
+            .table-responsive-box { overflow-x: auto; max-width: 100%; }
+            .toast-container { top: 8px; right: 8px; left: 8px; }
+            .type-block .tb-num { font-size: 22px; }
+            .type-block .tb-icon { font-size: 24px; }
+            .modal-marcas-box { padding: 16px; }
         }
 
-        /* Celulares muy pequeños */
         @media (max-width: 380px) {
-            .container {
-                padding: 3px;
-            }
-
-            .mod-btn {
-                min-height: 42px;
-                font-size: 9.5px;
-                padding: 6px 2px;
-            }
-
-            .card {
-                padding: 9px;
-            }
-
-            .stat-grid-colored {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .stat-card-colored {
-                padding: 9px 7px;
-            }
-
-            .stat-card-colored .stat-label {
-                font-size: 8.5px;
-            }
-
-            .stat-card-colored .stat-num {
-                font-size: 20px;
-            }
+            .container { padding: 3px; }
+            .mod-btn { min-height: 42px; font-size: 9.5px; padding: 6px 2px; }
+            .card { padding: 9px; }
+            .stat-grid-colored { grid-template-columns: 1fr 1fr; }
+            .stat-card-colored { padding: 9px 7px; }
+            .stat-card-colored .stat-label { font-size: 8.5px; }
+            .stat-card-colored .stat-num { font-size: 20px; }
         }
 
-        /* Accesibilidad táctil */
         @media (pointer: coarse) {
-            .btn,
-            .mod-btn,
-            .tab-btn,
-            select,
-            input {
-                min-height: 42px;
-            }
+            .btn, .mod-btn, .tab-btn, select, input { min-height: 42px; }
         }
-
     </style>
 </head>
 <body>
@@ -728,7 +638,10 @@
             <h1>GESTIÓN PATRIMONIAL TIC - MIDIS</h1>
             <p>Inventario 2026: Control de Bienes, Reportes Jerárquicos y Emisión de Actas</p>
         </div>
-        <span id="badgeConexion" class="badge-status badge-wait">Sincronizando con Drive...</span>
+        <div class="header-actions">
+            <button class="btn btn-amber" onclick="sincronizarDrive(true)" title="Forzar sincronización desde Drive">🔄 Sincronizar Drive</button>
+            <span id="badgeConexion" class="badge-status badge-wait">Sincronizando con Drive...</span>
+        </div>
     </div>
 
     <div class="nav-modules">
@@ -798,7 +711,6 @@
             </div>
 
             <div class="two-columns-vertical">
-                <!-- Columna Izquierda: Ficha Técnica -->
                 <div class="vertical-pane">
                     <div class="pane-title">
                         <span>Ficha Técnica del Bien</span>
@@ -812,53 +724,19 @@
                         </label>
                     </div>
 
-                    <div class="field-group">
-                        <label>Código Patrimonial:</label>
-                        <input type="text" id="tecCodigo" class="input-control" disabled style="font-family:'JetBrains Mono', monospace; font-weight:800;">
-                    </div>
-                    <div class="field-group">
-                        <label>Descripción del Bien:</label>
-                        <input type="text" id="tecDesc" class="input-control" disabled>
-                    </div>
-                    <div class="field-group">
-                        <label>Marca:</label>
-                        <input type="text" id="tecMarca" class="input-control" disabled>
-                    </div>
-                    <div class="field-group">
-                        <label>Modelo:</label>
-                        <input type="text" id="tecModelo" class="input-control" disabled>
-                    </div>
-                    <div class="field-group">
-                        <label>Número de Serie:</label>
-                        <input type="text" id="tecSerie" class="input-control" disabled style="font-family:'JetBrains Mono', monospace;">
-                    </div>
-                    <div class="field-group">
-                        <label>Sede / Ambiente:</label>
-                        <input type="text" id="tecAmbiente" class="input-control" disabled>
-                    </div>
-                    <div class="field-group">
-                        <label>Antigüedad:</label>
-                        <input type="text" id="tecAntiguedad" class="input-control" disabled style="font-weight:700;">
-                    </div>
-                    <div class="field-group">
-                        <label>Procesador:</label>
-                        <input type="text" id="tecProcesador" class="input-control" disabled placeholder="Ej: Intel Core i5-1145G7">
-                    </div>
-                    <div class="field-group">
-                        <label>Memoria RAM:</label>
-                        <input type="text" id="tecRam" class="input-control" disabled placeholder="Ej: 16 GB DDR4">
-                    </div>
-                    <div class="field-group">
-                        <label>Disco Duro / SSD:</label>
-                        <input type="text" id="tecDisco" class="input-control" disabled placeholder="Ej: SSD 512 GB">
-                    </div>
-                    <div class="field-group">
-                        <label>Dirección IP:</label>
-                        <input type="text" id="tecIp" class="input-control" disabled placeholder="Ej: 192.168.1.100" style="font-family:'JetBrains Mono', monospace;">
-                    </div>
+                    <div class="field-group"><label>Código Patrimonial:</label><input type="text" id="tecCodigo" class="input-control" disabled style="font-family:'JetBrains Mono', monospace; font-weight:800;"></div>
+                    <div class="field-group"><label>Descripción del Bien:</label><input type="text" id="tecDesc" class="input-control" disabled></div>
+                    <div class="field-group"><label>Marca:</label><input type="text" id="tecMarca" class="input-control" disabled></div>
+                    <div class="field-group"><label>Modelo:</label><input type="text" id="tecModelo" class="input-control" disabled></div>
+                    <div class="field-group"><label>Número de Serie:</label><input type="text" id="tecSerie" class="input-control" disabled style="font-family:'JetBrains Mono', monospace;"></div>
+                    <div class="field-group"><label>Sede / Ambiente:</label><input type="text" id="tecAmbiente" class="input-control" disabled></div>
+                    <div class="field-group"><label>Antigüedad:</label><input type="text" id="tecAntiguedad" class="input-control" disabled style="font-weight:700;"></div>
+                    <div class="field-group"><label>Procesador:</label><input type="text" id="tecProcesador" class="input-control" disabled placeholder="Ej: Intel Core i5-1145G7"></div>
+                    <div class="field-group"><label>Memoria RAM:</label><input type="text" id="tecRam" class="input-control" disabled placeholder="Ej: 16 GB DDR4"></div>
+                    <div class="field-group"><label>Disco Duro / SSD:</label><input type="text" id="tecDisco" class="input-control" disabled placeholder="Ej: SSD 512 GB"></div>
+                    <div class="field-group"><label>Dirección IP:</label><input type="text" id="tecIp" class="input-control" disabled placeholder="Ej: 192.168.1.100" style="font-family:'JetBrains Mono', monospace;"></div>
                 </div>
 
-                <!-- Columna Derecha: Gestión y Reasignación -->
                 <div class="vertical-pane">
                     <div class="pane-title">Gestión y Reasignación en Drive</div>
 
@@ -876,22 +754,10 @@
                         </div>
                     </div>
 
-                    <div class="field-group">
-                        <label>DNI del Servidor:</label>
-                        <input type="text" id="editDni" class="input-control" maxlength="15">
-                    </div>
-                    <div class="field-group">
-                        <label>Nombres y Apellidos del Servidor:</label>
-                        <input type="text" id="editUsuario" class="input-control" maxlength="120">
-                    </div>
-                    <div class="field-group">
-                        <label>Área / Dependencia:</label>
-                        <input type="text" id="editArea" class="input-control" maxlength="150">
-                    </div>
-                    <div class="field-group">
-                        <label>Sub-Área / Oficina:</label>
-                        <input type="text" id="editSubArea" class="input-control" maxlength="150">
-                    </div>
+                    <div class="field-group"><label>DNI del Servidor:</label><input type="text" id="editDni" class="input-control" maxlength="15"></div>
+                    <div class="field-group"><label>Nombres y Apellidos del Servidor:</label><input type="text" id="editUsuario" class="input-control" maxlength="120"></div>
+                    <div class="field-group"><label>Área / Dependencia:</label><input type="text" id="editArea" class="input-control" maxlength="150"></div>
+                    <div class="field-group"><label>Sub-Área / Oficina:</label><input type="text" id="editSubArea" class="input-control" maxlength="150"></div>
 
                     <div style="margin-top: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         <button class="btn btn-green" id="btnSave" onclick="guardarCambios()">💾 Guardar en Google Drive</button>
@@ -924,10 +790,47 @@
             </div>
 
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                <button class="btn btn-blue" onclick="generarReporteModulo2()">Visualizar Reporte</button>
-                <button class="btn btn-amber" onclick="descargarExcelModulo2()">📥 Descargar Excel (.xlsx)</button>
-                <button class="btn btn-green" id="btnVistaPreviaM2" onclick="imprimirVistaPreviaReporteM2()" disabled>🖨️ Vista Previa A4</button>
-                <button class="btn btn-gray" onclick="limpiarReporteModulo2()">Limpiar Filtros</button>
+                <button class="btn btn-blue" onclick="confirmarYGenerarReporte()">🔎 Visualizar Reporte</button>
+                <button class="btn btn-amber" id="btnExcelM2" onclick="confirmarDescargaExcel()" disabled>📥 Descargar Excel (.xlsx)</button>
+                <button class="btn btn-green" id="btnVistaPreviaM2" onclick="confirmarImpresionM2()" disabled>🖨️ Vista Previa A4</button>
+                <button class="btn btn-gray" onclick="confirmarLimpiarReporte()">🧹 Limpiar Filtros</button>
+            </div>
+        </div>
+
+        <!-- TARJETAS ANALÍTICAS -->
+        <div id="m2AnalyticsWrapper" class="analytics-grid" style="display: none;">
+            <div class="analytics-card" id="cardMarcas">
+                <h4>🖥️ Distribución por Marca <span class="ac-total" id="acTotalMarcas">0</span></h4>
+                <div class="brand-rows" id="brandRows"></div>
+                <div class="brand-subtotal">
+                    <span>MARCAS DETECTADAS</span>
+                    <span id="brandCount">0</span>
+                </div>
+            </div>
+
+            <div class="analytics-card" id="cardTotales">
+                <h4>🖥️ Total de Equipos dentro del Área <span class="ac-total" id="acTotalEquipos">0</span></h4>
+                <div class="type-blocks">
+                    <div class="type-block cpu" id="typeCpu" onclick="abrirModalMarcas('CPU')" role="button" tabindex="0" title="Click para ver distribución por marca de CPU/Laptops">
+                        <span class="tb-icon">💻</span>
+                        <span class="tb-label">CPU / Laptops</span>
+                        <span class="tb-num" id="typeCpuCount">0</span>
+                        <span class="tb-hint">Ver marcas →</span>
+                    </div>
+                    <div class="type-block monitor" id="typeMonitor" onclick="abrirModalMarcas('MONITOR')" role="button" tabindex="0" title="Click para ver distribución por marca de monitores">
+                        <span class="tb-icon">🖥️</span>
+                        <span class="tb-label">Monitores</span>
+                        <span class="tb-num" id="typeMonitorCount">0</span>
+                        <span class="tb-hint">Ver marcas →</span>
+                    </div>
+                    <div class="type-block teclado" id="typeTeclado" onclick="abrirModalMarcas('TECLADO')" role="button" tabindex="0" title="Click para ver distribución por marca de teclados">
+                        <span class="tb-icon">⌨️</span>
+                        <span class="tb-label">Teclados</span>
+                        <span class="tb-num" id="typeTecladoCount">0</span>
+                        <span class="tb-hint">Ver marcas →</span>
+                    </div>
+                </div>
+                <div class="age-detail" id="ageDetail">Haz click en una tarjeta para ver el detalle por marca.</div>
             </div>
         </div>
 
@@ -1002,8 +905,8 @@
 
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
                 <button class="btn btn-blue" onclick="sincronizarDrive(true)">🔄 Sincronizar Drive</button>
-                <button class="btn btn-green" onclick="imprimirVistaPreviaActa()">🖨️ Vista Previa A4 (PDF)</button>
-                <button class="btn btn-gray" onclick="m3LimpiarActa()">🧹 Limpiar Tabla</button>
+                <button class="btn btn-green" onclick="confirmarImpresionActa()">🖨️ Vista Previa A4 (PDF)</button>
+                <button class="btn btn-gray" onclick="confirmarLimpiarActa()">🧹 Limpiar Tabla</button>
             </div>
         </div>
 
@@ -1055,7 +958,7 @@
                 </div>
 
                 <div class="sig-col">
-                    <div class="sig-role-text" id="sigTituloDer">RECIBÍ CONFORME</div>
+                    <div class="sig-role-title sig-role-text" id="sigTituloDer">RECIBÍ CONFORME</div>
                     <div class="sig-line-top"></div>
                     <div class="sig-meta-line"><b>Nombre:</b> <span id="sigNomDer" class="inline-editable" contenteditable="true">MINAYA SILENCIO, XIOMARA STHEFANIE</span></div>
                     <div class="sig-meta-line"><b>DNI:</b> <span id="sigDniDer" class="inline-editable" contenteditable="true">72953853</span></div>
@@ -1077,7 +980,11 @@
         urlScript: "https://script.google.com/macros/s/AKfycbzD8Coq2iELO0g1NjMQ6aHZW-aCWfuEwbNdn9P8xYplYIgV6Kmcg9wHH_2UXRE2YQ8/exec",
         timeoutMs: 25000,
         cacheKey: "midis_inventario_cache",
-        cacheTTL: 5 * 60 * 1000 // 5 minutos
+        cacheTTL: 2 * 60 * 1000,
+        ogti: {
+            nombre: "Mijael Rivera Lopez",
+            dni: "48100357"
+        }
     };
 
     let inventario = [];
@@ -1088,13 +995,109 @@
     let modoActaActual = "ENTREGA";
     let edicionTotalActiva = false;
     let datosReporteModulo2Cache = [];
-    let camposOriginales = {};
+    let hayCambiosSinGuardar = false;
 
     // =========================================================================
     // UTILIDADES
     // =========================================================================
     const normalizarDni = (v) => String(v || "").replace(/\.0$/, "").trim();
     const limpiarStr = (v) => String(v || "").replace(/\.0$/, "").trim();
+
+    function normalizarClaves(obj) {
+        const out = {};
+        if (!obj || typeof obj !== "object") return out;
+        Object.keys(obj).forEach(k => {
+            const key = String(k)
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^A-Za-z0-9]+/g, "_")
+                .replace(/^_+|_+$/g, "")
+                .toUpperCase();
+            out[key] = obj[k];
+        });
+        return out;
+    }
+
+    function campo(row, ...variantes) {
+        if (!row) return "";
+        for (const v of variantes) {
+            const norm = String(v)
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^A-Za-z0-9]+/g, "_")
+                .replace(/^_+|_+$/g, "")
+                .toUpperCase();
+            if (row[norm] !== undefined && row[norm] !== null && row[norm] !== "") {
+                return row[norm];
+            }
+        }
+        for (const key of Object.keys(row)) {
+            const normKey = String(key).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+            for (const v of variantes) {
+                const normV = String(v).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+                if (normKey === normV) return row[key];
+            }
+        }
+        return "";
+    }
+
+    function detectarPestana(row) {
+        const p = String(row._pestana || "").toUpperCase();
+        if (p) return p;
+        const desc = String(campo(row, "DESCRIPCION DEL BIEN", "DESCRIPCION", "DETALLE") || "").toUpperCase();
+        if (desc.includes("LAPTOP") || desc.includes("PORTATIL") || desc.includes("NOTEBOOK")) return "LAPTOP";
+        if (desc.includes("CPU") || desc.includes("COMPUTADORA") || desc.includes("DESKTOP")) return "CPU";
+        if (desc.includes("MONITOR") || desc.includes("PANTALLA")) return "MONITOR";
+        if (desc.includes("TECLADO") || desc.includes("KEYBOARD")) return "TECLADO";
+        if (desc.includes("MOUSE") || desc.includes("RATON")) return "MOUSE";
+        if (desc.includes("IMPRESORA") || desc.includes("PRINTER")) return "IMPRESORA";
+        return "OTROS";
+    }
+
+    function normalizarMarca(m) {
+        let s = String(m || "").trim().toUpperCase();
+        if (!s) return "SIN MARCA";
+        if (s.includes("HEWLETT") || s === "HP" || s.startsWith("HP ") || s.endsWith(" HP")) return "HP";
+        if (s.includes("LENOVO")) return "LENOVO";
+        if (s.includes("DELL")) return "DELL";
+        if (s.includes("ACER")) return "ACER";
+        if (s.includes("ASUS")) return "ASUS";
+        if (s.includes("APPLE") || s.includes("MAC")) return "APPLE";
+        if (s.includes("SAMSUNG")) return "SAMSUNG";
+        if (s.includes("LG")) return "LG";
+        if (s.includes("BROTHER")) return "BROTHER";
+        if (s.includes("EPSON")) return "EPSON";
+        return s;
+    }
+
+    function extraerAniosAntiguedad(texto) {
+        if (!texto) return null;
+        const t = String(texto).toLowerCase().trim();
+        if (t.includes("no registrada") || t === "" || t === "-") return null;
+
+        let anios = 0, meses = 0, encontrado = false;
+        const mAnios = t.match(/(\d+(?:[.,]\d+)?)\s*(?:años?|a\b)/);
+        if (mAnios) { anios = parseFloat(mAnios[1].replace(",", ".")); encontrado = true; }
+        const mMeses = t.match(/(\d+(?:[.,]\d+)?)\s*(?:meses?|m\b)/);
+        if (mMeses) { meses = parseFloat(mMeses[1].replace(",", ".")); encontrado = true; }
+
+        if (!encontrado) {
+            const soloNum = t.replace(/[^\d.,]/g, "").replace(",", ".");
+            const n = parseFloat(soloNum);
+            if (!isNaN(n)) { anios = n; encontrado = true; }
+        }
+        if (!encontrado) return null;
+        return anios + (meses / 12);
+    }
+
+    function categoriaAntiguedad(texto) {
+        const anios = extraerAniosAntiguedad(texto);
+        if (anios === null) return "SIN_DATO";
+        const cuatroMeses29 = (4 + 29 / 30) / 12;
+        if (anios <= cuatroMeses29) return "NUEVO";
+        if (anios >= 5) return "ANTIGUO";
+        return "INTERMEDIO";
+    }
 
     function mostrarToast(mensaje, tipo = "info", duracion = 4000) {
         const container = document.getElementById("toastContainer");
@@ -1167,23 +1170,20 @@
         badge.className = "badge-status badge-loading";
         badge.innerHTML = '<span class="spinner"></span> Sincronizando con Drive...';
 
-        // Intentar cargar desde caché si no se fuerza
         if (!forzar) {
             try {
                 const cacheRaw = localStorage.getItem(CONFIG.cacheKey);
                 if (cacheRaw) {
                     const cache = JSON.parse(cacheRaw);
                     if (Date.now() - cache.timestamp < CONFIG.cacheTTL && Array.isArray(cache.data) && cache.data.length > 0) {
-                        inventario = cache.data;
+                        inventario = cache.data.map(normalizarClaves);
                         badge.className = "badge-status badge-ok";
                         badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes (caché)`;
-                        cargarListasAutocompletado();
-                        inicializarFiltrosModulo2();
-                        inicializarFiltrosModulo3();
+                        postCarga();
                         return true;
                     }
                 }
-            } catch (e) { /* caché corrupto, ignorar */ }
+            } catch (e) { /* caché corrupto */ }
         }
 
         try {
@@ -1197,37 +1197,27 @@
 
             if (data && data.error) throw new Error(data.error);
 
-            // Aceptar tanto array directo como {success, data}
             let lista = [];
-            if (Array.isArray(data)) {
-                lista = data;
-            } else if (data && Array.isArray(data.data)) {
-                lista = data.data;
-            } else {
-                throw new Error("Estructura de respuesta no reconocida.");
-            }
+            if (Array.isArray(data)) lista = data;
+            else if (data && Array.isArray(data.data)) lista = data.data;
+            else throw new Error("Estructura de respuesta no reconocida.");
 
-            if (lista.length === 0) {
-                throw new Error("El inventario está vacío o el formato es incorrecto.");
-            }
+            if (lista.length === 0) throw new Error("El inventario está vacío o el formato es incorrecto.");
 
-            inventario = lista;
+            inventario = lista.map(normalizarClaves);
 
-            // Guardar en caché
             try {
                 localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
                     timestamp: Date.now(),
                     data: inventario
                 }));
-            } catch (e) { /* localStorage lleno, ignorar */ }
+            } catch (e) { /* localStorage lleno */ }
 
             badge.className = "badge-status badge-ok";
             badge.innerText = `✅ Drive Conectado: ${inventario.length} bienes`;
             mostrarToast(`Inventario cargado: ${inventario.length} bienes`, "success");
 
-            cargarListasAutocompletado();
-            inicializarFiltrosModulo2();
-            inicializarFiltrosModulo3();
+            postCarga();
             return true;
         } catch (e) {
             console.error("[sincronizarDrive]", e);
@@ -1235,23 +1225,26 @@
             badge.innerText = "❌ Error de conexión con Drive";
             mostrarToast(`Error al sincronizar: ${e.message}`, "error", 6000);
 
-            // Intentar cargar caché vieja como fallback
             try {
                 const cacheRaw = localStorage.getItem(CONFIG.cacheKey);
                 if (cacheRaw) {
                     const cache = JSON.parse(cacheRaw);
                     if (Array.isArray(cache.data) && cache.data.length > 0) {
-                        inventario = cache.data;
+                        inventario = cache.data.map(normalizarClaves);
                         badge.className = "badge-status badge-wait";
                         badge.innerText = `⚠️ Drive offline - usando caché (${inventario.length} bienes)`;
-                        cargarListasAutocompletado();
-                        inicializarFiltrosModulo2();
-                        inicializarFiltrosModulo3();
+                        postCarga();
                     }
                 }
-            } catch (e2) { /* sin caché, todo falla */ }
+            } catch (e2) { /* sin caché */ }
             return false;
         }
+    }
+
+    function postCarga() {
+        cargarListasAutocompletado();
+        inicializarFiltrosModulo2();
+        inicializarFiltrosModulo3();
     }
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1270,15 +1263,23 @@
         }
 
         document.querySelectorAll(".input-control").forEach(input => {
-            input.addEventListener("input", function () {
-                this.classList.toggle("modified", true);
+            input.addEventListener("input", () => { hayCambiosSinGuardar = true; });
+        });
+
+        ["typeCpu", "typeMonitor", "typeTeclado"].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    el.click();
+                }
             });
         });
     });
 
     window.addEventListener("beforeunload", (e) => {
-        const hayCambios = Object.values(camposOriginales).some(v => v === false);
-        if (Object.keys(camposOriginales).length > 0) {
+        if (hayCambiosSinGuardar) {
             e.preventDefault();
             e.returnValue = "";
         }
@@ -1292,9 +1293,9 @@
 
         const personasUnicas = new Map();
         inventario.forEach(r => {
-            const nom = (r["USUARIO RESPONSABLE"] || "").trim();
-            const dni = normalizarDni(r["DNI"]);
-            const cod = limpiarStr(r["SBN_CONCILIADO"]);
+            const nom = (campo(r, "USUARIO RESPONSABLE", "USUARIO") || "").trim();
+            const dni = normalizarDni(campo(r, "DNI"));
+            const cod = limpiarStr(campo(r, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
             if (nom && !personasUnicas.has(nom)) {
                 personasUnicas.set(nom, dni);
                 const opt = document.createElement("option");
@@ -1330,8 +1331,8 @@
         }
 
         let coincidencia = inventario.filter(r => {
-            const dni = normalizarDni(r["DNI"]);
-            const nom = (r["USUARIO RESPONSABLE"] || "").toUpperCase();
+            const dni = normalizarDni(campo(r, "DNI"));
+            const nom = (campo(r, "USUARIO RESPONSABLE", "USUARIO") || "").toUpperCase();
             if (dniQuery) return dni === dniQuery;
             return nom.includes(queryLimpio);
         });
@@ -1342,7 +1343,7 @@
         }
 
         const matchExacto = coincidencia.find(r =>
-            (r["USUARIO RESPONSABLE"] || "").toUpperCase() === queryLimpio
+            (campo(r, "USUARIO RESPONSABLE", "USUARIO") || "").toUpperCase() === queryLimpio
         );
         servidorActualSeleccionado = matchExacto || coincidencia[0];
         equiposDelServidor = coincidencia;
@@ -1356,14 +1357,16 @@
         const cod = limpiarStr(document.getElementById("inCod").value);
         if (!cod) { mostrarToast("Ingresa un código patrimonial.", "warning"); return; }
 
-        const bien = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === cod);
+        const bien = inventario.find(r =>
+            limpiarStr(campo(r, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO")) === cod
+        );
         if (!bien) { mostrarToast(`No se encontró el bien con código: ${cod}`, "error"); return; }
 
-        const dni = normalizarDni(bien["DNI"]);
-        const nom = (bien["USUARIO RESPONSABLE"] || "").trim();
+        const dni = normalizarDni(campo(bien, "DNI"));
+        const nom = (campo(bien, "USUARIO RESPONSABLE", "USUARIO") || "").trim();
         equiposDelServidor = inventario.filter(r =>
-            (dni && normalizarDni(r["DNI"]) === dni) ||
-            (!dni && nom && r["USUARIO RESPONSABLE"] === nom)
+            (dni && normalizarDni(campo(r, "DNI")) === dni) ||
+            (!dni && nom && campo(r, "USUARIO RESPONSABLE", "USUARIO") === nom)
         );
         if (!equiposDelServidor.length) equiposDelServidor = [bien];
 
@@ -1374,7 +1377,7 @@
     function mostrarFichaServidor(servidor, listaBienes, bienForzado = null) {
         let nCpu = 0, nMon = 0, nTec = 0;
         listaBienes.forEach(b => {
-            const p = (b._pestana || "").toUpperCase();
+            const p = detectarPestana(b);
             if (p.includes("CPU") || p.includes("LAPTO")) nCpu++;
             else if (p.includes("MONITOR")) nMon++;
             else if (p.includes("TECLADO")) nTec++;
@@ -1385,27 +1388,29 @@
         document.getElementById("cntMon").innerText = nMon;
         document.getElementById("cntTec").innerText = nTec;
 
-        document.getElementById("fHorizNombre").innerText = servidor["USUARIO RESPONSABLE"] || "SIN ASIGNAR";
-        document.getElementById("fHorizDni").innerText = normalizarDni(servidor["DNI"]) || "S/DNI";
-        document.getElementById("fHorizGerencia").innerText = servidor["GERENCIA"] || "-";
-        document.getElementById("fHorizArea").innerText = servidor["AREA"] || "-";
-        document.getElementById("fHorizSubarea").innerText = servidor["SUBAREA"] || "-";
+        document.getElementById("fHorizNombre").innerText = campo(servidor, "USUARIO RESPONSABLE", "USUARIO") || "SIN ASIGNAR";
+        document.getElementById("fHorizDni").innerText = normalizarDni(campo(servidor, "DNI")) || "S/DNI";
+        document.getElementById("fHorizGerencia").innerText = campo(servidor, "GERENCIA") || "-";
+        document.getElementById("fHorizArea").innerText = campo(servidor, "AREA") || "-";
+        document.getElementById("fHorizSubarea").innerText = campo(servidor, "SUBAREA", "SUB_AREA") || "-";
 
         const selBien = document.getElementById("selBienServidor");
         const boxSelector = document.getElementById("boxSelectorCascadaBienes");
         selBien.innerHTML = "";
 
-        listaBienes.forEach((b, idx) => {
+        listaBienes.forEach((b) => {
             const opt = document.createElement("option");
-            opt.value = idx;
-            const p = b._pestana || "BIEN";
-            opt.textContent = `[${p}] ${limpiarStr(b["SBN_CONCILIADO"])} - ${b["DESCRIPCION DEL BIEN"] || ""} (${b["MARCA"] || ""} ${b["MODELO"] || ""})`;
+            const codigo = limpiarStr(campo(b, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
+            opt.value = codigo;
+            const p = detectarPestana(b);
+            opt.textContent = `[${p}] ${codigo} - ${campo(b, "DESCRIPCION DEL BIEN", "DESCRIPCION") || ""} (${campo(b, "MARCA") || ""} ${campo(b, "MODELO") || ""})`;
             selBien.appendChild(opt);
         });
 
         if (bienForzado) {
-            const idxF = listaBienes.findIndex(x => limpiarStr(x["SBN_CONCILIADO"]) === limpiarStr(bienForzado["SBN_CONCILIADO"]));
-            if (idxF !== -1) selBien.selectedIndex = idxF;
+            const codF = limpiarStr(campo(bienForzado, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
+            const optMatch = Array.from(selBien.options).find(o => o.value === codF);
+            if (optMatch) selBien.value = optMatch.value;
         }
 
         const boxModo = document.getElementById("boxModoEdicionOpciones");
@@ -1425,7 +1430,6 @@
             badge.style.color = "#475569";
         }
 
-        camposOriginales = {};
         document.querySelectorAll(".input-control").forEach(i => i.classList.remove("modified"));
 
         cambioBienSeleccionado();
@@ -1444,8 +1448,11 @@
 
     function cambioBienSeleccionado() {
         const selBien = document.getElementById("selBienServidor");
-        const idx = parseInt(selBien.value || "0", 10);
-        bienEnEdicion = equiposDelServidor[idx] || servidorActualSeleccionado;
+        const codigoSel = selBien.value;
+        bienEnEdicion = equiposDelServidor.find(b =>
+            limpiarStr(campo(b, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO")) === codigoSel
+        ) || servidorActualSeleccionado;
+
         if (!bienEnEdicion) {
             ["tecCodigo","tecDesc","tecMarca","tecModelo","tecSerie","tecAmbiente","tecAntiguedad","tecProcesador","tecRam","tecDisco","tecIp","editDni","editUsuario","editArea","editSubArea"].forEach(id => {
                 const el = document.getElementById(id);
@@ -1454,17 +1461,17 @@
             return;
         }
 
-        document.getElementById("tecCodigo").value = limpiarStr(bienEnEdicion["SBN_CONCILIADO"]);
-        document.getElementById("tecDesc").value = bienEnEdicion["DESCRIPCION DEL BIEN"] || "";
-        document.getElementById("tecMarca").value = bienEnEdicion["MARCA"] || "";
-        document.getElementById("tecModelo").value = bienEnEdicion["MODELO"] || "";
-        document.getElementById("tecSerie").value = bienEnEdicion["SERIE"] || "";
-        document.getElementById("tecAmbiente").value = `${bienEnEdicion["SEDE"] || ""} / ${bienEnEdicion["AMBIENTE"] || ""}`.trim().replace(/^\/\s*/, "");
-        document.getElementById("tecAntiguedad").value = bienEnEdicion["ANTIGÜEDAD"] || "No registrada";
-        document.getElementById("tecProcesador").value = bienEnEdicion["PROCESADOR"] || "";
-        document.getElementById("tecRam").value = bienEnEdicion["RAM"] || "";
-        document.getElementById("tecDisco").value = bienEnEdicion["DISCO DURO"] || "";
-        document.getElementById("tecIp").value = bienEnEdicion["IP"] || "";
+        document.getElementById("tecCodigo").value = limpiarStr(campo(bienEnEdicion, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
+        document.getElementById("tecDesc").value = campo(bienEnEdicion, "DESCRIPCION DEL BIEN", "DESCRIPCION") || "";
+        document.getElementById("tecMarca").value = campo(bienEnEdicion, "MARCA") || "";
+        document.getElementById("tecModelo").value = campo(bienEnEdicion, "MODELO") || "";
+        document.getElementById("tecSerie").value = campo(bienEnEdicion, "SERIE") || "";
+        document.getElementById("tecAmbiente").value = `${campo(bienEnEdicion, "SEDE") || ""} / ${campo(bienEnEdicion, "AMBIENTE") || ""}`.trim().replace(/^\/\s*/, "");
+        document.getElementById("tecAntiguedad").value = campo(bienEnEdicion, "ANTIGUEDAD", "ANTIGÜEDAD") || "No registrada";
+        document.getElementById("tecProcesador").value = campo(bienEnEdicion, "PROCESADOR") || "";
+        document.getElementById("tecRam").value = campo(bienEnEdicion, "RAM") || "";
+        document.getElementById("tecDisco").value = campo(bienEnEdicion, "DISCO DURO", "DISCO_DURO", "ALMACENAMIENTO") || "";
+        document.getElementById("tecIp").value = campo(bienEnEdicion, "IP") || "";
 
         const camposTecnicos = ["tecDesc", "tecMarca", "tecModelo", "tecSerie", "tecAmbiente", "tecAntiguedad", "tecProcesador", "tecRam", "tecDisco", "tecIp"];
         camposTecnicos.forEach(id => {
@@ -1473,31 +1480,27 @@
         });
 
         const aiBox = document.getElementById("fAiBox");
-        const strAnt = String(bienEnEdicion["ANTIGÜEDAD"] || "").toLowerCase();
-        let anios = 0;
-        const match = strAnt.match(/(\d+(?:\.\d+)?)\s*año/);
-        if (match) anios = parseFloat(match[1]);
-        else if (strAnt.includes("mes") && !strAnt.includes("año")) anios = 0;
-        else anios = parseFloat(strAnt.replace(/[^\d.]/g, '')) || 0;
+        const strAnt = String(campo(bienEnEdicion, "ANTIGUEDAD", "ANTIGÜEDAD") || "");
+        const anios = extraerAniosAntiguedad(strAnt);
 
-        if (!strAnt || strAnt === "no registrada") {
+        if (anios === null) {
             aiBox.className = "ai-card amarillo";
             aiBox.innerHTML = `<b>🟡 ANTIGÜEDAD NO REGISTRADA</b><br>No se puede determinar el estado del equipo. Se recomienda registrar la fecha de adquisición.`;
         } else if (anios <= 4.0) {
             aiBox.className = "ai-card verde";
-            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Rango ≤ 4 años). El equipo está en buen estado y operativo.`;
+            aiBox.innerHTML = `<b>🟢 DIAGNÓSTICO: BUENO</b><br>Antigüedad: <b>${strAnt}</b> (≈ ${anios.toFixed(1)} años, rango ≤ 4 años). El equipo está en buen estado y operativo.`;
         } else if (anios > 4.0 && anios <= 5.0) {
             aiBox.className = "ai-card amarillo";
-            aiBox.innerHTML = `<b>🟡 DIAGNÓSTICO: REGULAR / ALERTA</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Entre 4 y 5 años). Próximo al fin de su vida útil estimada; programar revisión técnica.`;
+            aiBox.innerHTML = `<b>🟡 DIAGNÓSTICO: REGULAR / ALERTA</b><br>Antigüedad: <b>${strAnt}</b> (≈ ${anios.toFixed(1)} años, entre 4 y 5). Próximo al fin de su vida útil; programar revisión técnica.`;
         } else {
             aiBox.className = "ai-card rojo";
-            aiBox.innerHTML = `<b>🔴 DIAGNÓSTICO: OBSOLETO</b><br>Antigüedad: <b>${bienEnEdicion["ANTIGÜEDAD"]}</b> (Supera 5 años). El equipo cumplió su ciclo de vida; elegible prioritario para renovación IOARR.`;
+            aiBox.innerHTML = `<b>🔴 DIAGNÓSTICO: OBSOLETO</b><br>Antigüedad: <b>${strAnt}</b> (≈ ${anios.toFixed(1)} años, supera 5). El equipo cumplió su ciclo de vida; elegible prioritario para renovación IOARR.`;
         }
 
-        document.getElementById("editDni").value = normalizarDni(bienEnEdicion["DNI"]);
-        document.getElementById("editUsuario").value = bienEnEdicion["USUARIO RESPONSABLE"] || "";
-        document.getElementById("editArea").value = bienEnEdicion["AREA"] || bienEnEdicion["GERENCIA"] || "";
-        document.getElementById("editSubArea").value = bienEnEdicion["SUBAREA"] || "";
+        document.getElementById("editDni").value = normalizarDni(campo(bienEnEdicion, "DNI"));
+        document.getElementById("editUsuario").value = campo(bienEnEdicion, "USUARIO RESPONSABLE", "USUARIO") || "";
+        document.getElementById("editArea").value = campo(bienEnEdicion, "AREA") || campo(bienEnEdicion, "GERENCIA") || "";
+        document.getElementById("editSubArea").value = campo(bienEnEdicion, "SUBAREA", "SUB_AREA") || "";
         cambioModoEdicion();
 
         document.querySelectorAll(".input-control").forEach(i => i.classList.remove("modified"));
@@ -1510,7 +1513,7 @@
     }
 
     // =========================================================================
-    // GUARDAR CAMBIOS EN DRIVE
+    // GUARDAR CAMBIOS
     // =========================================================================
     async function guardarCambios() {
         if (!bienEnEdicion) { mostrarToast("No hay bien seleccionado para guardar.", "warning"); return; }
@@ -1537,8 +1540,14 @@
 
         if (esTodos) {
             const ok = await confirmar(
-                `Se actualizarán TODOS los equipos asignados al DNI ${normalizarDni(bienEnEdicion["DNI"])} y se reasignarán a "${nuevoUser}" (DNI: ${nuevoDni}). ¿Continuar?`,
+                `Se actualizarán TODOS los equipos asignados al DNI ${normalizarDni(campo(bienEnEdicion, "DNI"))} y se reasignarán a "${nuevoUser}" (DNI: ${nuevoDni}). ¿Continuar?`,
                 "⚠️ Reasignación Masiva"
+            );
+            if (!ok) return;
+        } else {
+            const ok = await confirmar(
+                `Se guardarán los cambios del bien "${limpiarStr(campo(bienEnEdicion, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"))}" en Google Drive. ¿Continuar?`,
+                "💾 Confirmar guardado"
             );
             if (!ok) return;
         }
@@ -1554,8 +1563,8 @@
         const actualizarTecnicos = edicionTotalActiva || esModoCodigoPatrimonial;
 
         const payload = {
-            codigo: limpiarStr(bienEnEdicion["SBN_CONCILIADO"]),
-            dniAntiguo: normalizarDni(bienEnEdicion["DNI"]),
+            codigo: limpiarStr(campo(bienEnEdicion, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO")),
+            dniAntiguo: normalizarDni(campo(bienEnEdicion, "DNI")),
             nuevoUsuario: nuevoUser,
             nuevoDni: nuevoDni,
             nuevaArea: nuevaArea,
@@ -1587,41 +1596,39 @@
                 const texto = await res.text();
                 data = JSON.parse(texto);
             } catch (e) {
-                throw new Error("Respuesta inválida del servidor. Verifica la implementación del Web App.");
+                throw new Error("Respuesta inválida del servidor.");
             }
 
-            if (!data.success) {
-                throw new Error(data.error || "Error desconocido del servidor");
-            }
+            if (!data.success) throw new Error(data.error || "Error desconocido del servidor");
 
             if (esTodos) {
-                const dniAnt = normalizarDni(bienEnEdicion["DNI"]);
+                const dniAnt = normalizarDni(campo(bienEnEdicion, "DNI"));
                 inventario.forEach(r => {
-                    if (normalizarDni(r["DNI"]) === dniAnt) {
-                        r["USUARIO RESPONSABLE"] = nuevoUser;
-                        r["DNI"] = nuevoDni;
-                        r["AREA"] = nuevaArea;
-                        r["SUBAREA"] = nuevaSubArea;
+                    if (normalizarDni(campo(r, "DNI")) === dniAnt) {
+                        r.USUARIO_RESPONSABLE = nuevoUser;
+                        r.DNI = nuevoDni;
+                        r.AREA = nuevaArea;
+                        r.SUBAREA = nuevaSubArea;
                     }
                 });
-                mostrarToast(`✅ ${data.actualizados} equipo(s) reasignado(s) exitosamente.`, "success");
+                mostrarToast(`✅ ${data.actualizados || equiposDelServidor.length} equipo(s) reasignado(s).`, "success");
             } else {
-                bienEnEdicion["USUARIO RESPONSABLE"] = nuevoUser;
-                bienEnEdicion["DNI"] = nuevoDni;
-                bienEnEdicion["AREA"] = nuevaArea;
-                bienEnEdicion["SUBAREA"] = nuevaSubArea;
+                bienEnEdicion.USUARIO_RESPONSABLE = nuevoUser;
+                bienEnEdicion.DNI = nuevoDni;
+                bienEnEdicion.AREA = nuevaArea;
+                bienEnEdicion.SUBAREA = nuevaSubArea;
 
                 if (actualizarTecnicos) {
-                    bienEnEdicion["DESCRIPCION DEL BIEN"] = payload.descripcion;
-                    bienEnEdicion["MARCA"] = payload.marca;
-                    bienEnEdicion["MODELO"] = payload.modelo;
-                    bienEnEdicion["SERIE"] = payload.serie;
-                    bienEnEdicion["AMBIENTE"] = payload.ambiente;
-                    bienEnEdicion["ANTIGÜEDAD"] = payload.antiguedad;
-                    bienEnEdicion["PROCESADOR"] = payload.procesador;
-                    bienEnEdicion["RAM"] = payload.ram;
-                    bienEnEdicion["DISCO DURO"] = payload.discoDuro;
-                    bienEnEdicion["IP"] = payload.ip;
+                    bienEnEdicion.DESCRIPCION_DEL_BIEN = payload.descripcion;
+                    bienEnEdicion.MARCA = payload.marca;
+                    bienEnEdicion.MODELO = payload.modelo;
+                    bienEnEdicion.SERIE = payload.serie;
+                    bienEnEdicion.AMBIENTE = payload.ambiente;
+                    bienEnEdicion.ANTIGUEDAD = payload.antiguedad;
+                    bienEnEdicion.PROCESADOR = payload.procesador;
+                    bienEnEdicion.RAM = payload.ram;
+                    bienEnEdicion.DISCO_DURO = payload.discoDuro;
+                    bienEnEdicion.IP = payload.ip;
                 }
                 mostrarToast(`✅ Bien actualizado correctamente.`, "success");
             }
@@ -1633,11 +1640,11 @@
                 }));
             } catch (e) { /* ignorar */ }
 
+            hayCambiosSinGuardar = false;
             notice.style.color = "#15803d";
             notice.innerText = "✅ ¡Actualizado exitosamente en Drive!";
 
             cambioBienSeleccionado();
-
             setTimeout(() => { notice.innerText = ""; }, 4000);
         } catch (e) {
             console.error("[guardarCambios]", e);
@@ -1656,18 +1663,20 @@
         document.getElementById("fichaConsultaCompleta").style.display = "none";
         bienEnEdicion = null;
         edicionTotalActiva = false;
+        esModoCodigoPatrimonial = false;
         document.getElementById("chkEditarTodo").checked = false;
-        camposOriginales = {};
+        hayCambiosSinGuardar = false;
+        document.querySelectorAll(".input-control").forEach(i => i.classList.remove("modified"));
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // =========================================================================
-    // MÓDULO 2
+    // MÓDULO 2: FILTROS + ANÁLISIS
     // =========================================================================
     function inicializarFiltrosModulo2() {
         const selG = document.getElementById("m2Gerencia");
         selG.innerHTML = '<option value="">-- Seleccione Gerencia --</option>';
-        const gerencias = [...new Set(inventario.map(r => (r["GERENCIA"] || "").trim()).filter(Boolean))].sort();
+        const gerencias = [...new Set(inventario.map(r => (campo(r, "GERENCIA") || "").trim()).filter(Boolean))].sort();
         gerencias.forEach(g => {
             const opt = document.createElement("option"); opt.value = g; opt.textContent = g;
             selG.appendChild(opt);
@@ -1680,14 +1689,14 @@
         const selS = document.getElementById("m2SubArea");
         selA.innerHTML = '<option value="">-- Todas las Áreas --</option>';
         selS.innerHTML = '<option value="">-- Todas las Subáreas --</option>';
-        if (!ger) return;
+        if (!ger) { ocultarReporteM2(); return; }
 
-        const areas = [...new Set(inventario.filter(r => (r["GERENCIA"] || "").trim() === ger).map(r => (r["AREA"] || "").trim()).filter(Boolean))].sort();
+        const areas = [...new Set(inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger).map(r => (campo(r, "AREA") || "").trim()).filter(Boolean))].sort();
         areas.forEach(a => {
             const opt = document.createElement("option"); opt.value = a; opt.textContent = a;
             selA.appendChild(opt);
         });
-        generarReporteModulo2();
+        ocultarReporteM2();
     }
 
     function m2CambioArea() {
@@ -1696,14 +1705,30 @@
         const selS = document.getElementById("m2SubArea");
         selS.innerHTML = '<option value="">-- Todas las Subáreas --</option>';
 
-        let subset = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger);
-        if (area) subset = subset.filter(r => (r["AREA"] || "").trim() === area);
+        let subset = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger);
+        if (area) subset = subset.filter(r => (campo(r, "AREA") || "").trim() === area);
 
-        const subareas = [...new Set(subset.map(r => (r["SUBAREA"] || "").trim()).filter(Boolean))].sort();
+        const subareas = [...new Set(subset.map(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim()).filter(Boolean))].sort();
         subareas.forEach(s => {
             const opt = document.createElement("option"); opt.value = s; opt.textContent = s;
             selS.appendChild(opt);
         });
+        ocultarReporteM2();
+    }
+
+    function ocultarReporteM2() {
+        document.getElementById("m2ContenedorReporte").style.display = "none";
+        document.getElementById("m2AnalyticsWrapper").style.display = "none";
+        document.getElementById("btnVistaPreviaM2").disabled = true;
+        document.getElementById("btnExcelM2").disabled = true;
+        datosReporteModulo2Cache = [];
+    }
+
+    async function confirmarYGenerarReporte() {
+        const ger = document.getElementById("m2Gerencia").value;
+        if (!ger) { mostrarToast("Selecciona al menos una Gerencia.", "warning"); return; }
+        const ok = await confirmar("Se generará el reporte con los filtros seleccionados. ¿Continuar?", "📊 Generar Reporte");
+        if (!ok) return;
         generarReporteModulo2();
     }
 
@@ -1714,27 +1739,82 @@
         const cont = document.getElementById("m2ContenedorReporte");
         const tbody = document.getElementById("m2TableBody");
         const btnV = document.getElementById("btnVistaPreviaM2");
+        const btnX = document.getElementById("btnExcelM2");
+        const analytics = document.getElementById("m2AnalyticsWrapper");
 
-        if (!ger) { cont.style.display = "none"; btnV.disabled = true; return; }
+        if (!ger) { ocultarReporteM2(); return; }
 
-        let lista = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger);
-        if (area) lista = lista.filter(r => (r["AREA"] || "").trim() === area);
-        if (sub) lista = lista.filter(r => (r["SUBAREA"] || "").trim() === sub);
+        let lista = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger);
+        if (area) lista = lista.filter(r => (campo(r, "AREA") || "").trim() === area);
+        if (sub) lista = lista.filter(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim() === sub);
 
+        // ---------- TARJETA 1: MARCAS ----------
+        const marcasMap = {};
+        lista.forEach(r => {
+            const m = normalizarMarca(campo(r, "MARCA"));
+            marcasMap[m] = (marcasMap[m] || 0) + 1;
+        });
+
+        const coloresMarca = {
+            "HP": "#0096D6", "LENOVO": "#E2231A", "DELL": "#007DB8", "ACER": "#83B81A",
+            "ASUS": "#00539B", "APPLE": "#555555", "SAMSUNG": "#1428A0", "LG": "#A50034",
+            "BROTHER": "#004B87", "EPSON": "#003399", "SIN MARCA": "#94a3b8"
+        };
+
+        const totalMarcas = lista.length;
+        const sortedMarcas = Object.entries(marcasMap).sort((a, b) => b[1] - a[1]);
+        const brandRows = document.getElementById("brandRows");
+        brandRows.innerHTML = "";
+        sortedMarcas.forEach(([marca, count]) => {
+            const pct = totalMarcas ? (count / totalMarcas * 100) : 0;
+            const color = coloresMarca[marca] || "#64748b";
+            const row = document.createElement("div");
+            row.className = "brand-row";
+            row.innerHTML = `
+                <span class="brand-dot" style="background:${color};"></span>
+                <span class="brand-name">${marca}</span>
+                <span class="brand-bar"><div style="width:${pct}%;background:${color};"></div></span>
+                <span class="brand-count">${count}</span>
+            `;
+            brandRows.appendChild(row);
+        });
+        document.getElementById("acTotalMarcas").textContent = totalMarcas;
+        document.getElementById("brandCount").textContent = sortedMarcas.length;
+
+        // ---------- TARJETA 2: TOTALES POR TIPO ----------
+        let nCpuLaptop = 0, nMonitor = 0, nTeclado = 0, nOtros = 0;
+        lista.forEach(r => {
+            const p = detectarPestana(r).toUpperCase();
+            if (p.includes("CPU") || p.includes("LAPTO")) nCpuLaptop++;
+            else if (p.includes("MONITOR")) nMonitor++;
+            else if (p.includes("TECLADO")) nTeclado++;
+            else nOtros++;
+        });
+
+        document.getElementById("typeCpuCount").textContent = nCpuLaptop;
+        document.getElementById("typeMonitorCount").textContent = nMonitor;
+        document.getElementById("typeTecladoCount").textContent = nTeclado;
+        document.getElementById("acTotalEquipos").textContent = lista.length;
+        document.getElementById("ageDetail").innerHTML =
+            `Total evaluados: <b>${lista.length}</b> · Otros bienes: <b>${nOtros}</b> · Click en una tarjeta para ver distribución por marca.`;
+
+        analytics.style.display = "grid";
+
+        // ---------- TABLA CONSOLIDADA ----------
         let mapU = new Map();
         lista.forEach(item => {
-            const dni = normalizarDni(item["DNI"]);
-            const nom = (item["USUARIO RESPONSABLE"] || "SIN ASIGNAR").trim();
-            const key = dni ? `${dni}_${nom}` : `S_DNI_${item["SBN_CONCILIADO"]}`;
+            const dni = normalizarDni(campo(item, "DNI"));
+            const nom = (campo(item, "USUARIO RESPONSABLE", "USUARIO") || "SIN ASIGNAR").trim();
+            const key = dni ? `${dni}_${nom}` : `S_DNI_${limpiarStr(campo(item, "SBN_CONCILIADO", "CODIGO"))}`;
 
             if (!mapU.has(key)) {
                 mapU.set(key, { nom: nom, dni: dni || "S/DNI", total: 0, cpus: [], mons: [], tecs: [] });
             }
             const u = mapU.get(key);
             u.total++;
-            const cod = limpiarStr(item["SBN_CONCILIADO"]);
-            const mod = `${item["MARCA"] || ""} ${item["MODELO"] || ""}`.trim();
-            const p = (item._pestana || "").toUpperCase();
+            const cod = limpiarStr(campo(item, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
+            const mod = `${campo(item, "MARCA") || ""} ${campo(item, "MODELO") || ""}`.trim();
+            const p = detectarPestana(item);
 
             const card = `<div class="device-card-item"><b>${cod}</b> - ${mod}</div>`;
             if (p.includes("CPU") || p.includes("LAPTO")) u.cpus.push(card);
@@ -1751,6 +1831,7 @@
             document.getElementById("m2Resumen").innerText = "Total Servidores: 0 | Total Bienes: 0";
             cont.style.display = "block";
             btnV.disabled = true;
+            btnX.disabled = true;
             return;
         }
 
@@ -1781,37 +1862,250 @@
         document.getElementById("m2Resumen").innerText = `Total Servidores: ${mapU.size} | Total Bienes Computacionales: ${lista.length}`;
         cont.style.display = "block";
         btnV.disabled = false;
+        btnX.disabled = false;
+    }
+
+    // =========================================================================
+    // DESCARGA DE EXCEL FILTRADO (UNA SOLA HOJA)
+    // =========================================================================
+    async function confirmarDescargaExcel() {
+        if (!datosReporteModulo2Cache.length) {
+            mostrarToast("Primero genera un reporte con datos.", "warning");
+            return;
+        }
+        const ger = document.getElementById("m2Gerencia").value;
+        const area = document.getElementById("m2Area").value || "TODAS";
+        const sub = document.getElementById("m2SubArea").value || "TODAS";
+        const ok = await confirmar(
+            `Se descargará un Excel con <b>UNA SOLA HOJA</b> que incluye los responsables y los códigos SBN de sus equipos (CPU/Laptop, Monitor, Teclado) según el filtro actual:<br><br><b>Gerencia:</b> ${ger}<br><b>Área:</b> ${area}<br><b>Subárea:</b> ${sub}<br><br>Los filtros NO se incluyen como columnas en el Excel.<br><br>¿Continuar?`,
+            "📥 Descargar Excel filtrado"
+        );
+        if (!ok) return;
+        descargarExcelModulo2();
     }
 
     function descargarExcelModulo2() {
-        if (!datosReporteModulo2Cache.length) {
-            mostrarToast("Primero selecciona una Gerencia para generar los datos del reporte.", "warning");
+        // Reconstruir la lista filtrada
+        const ger = document.getElementById("m2Gerencia").value;
+        const area = document.getElementById("m2Area").value;
+        const sub = document.getElementById("m2SubArea").value;
+
+        let lista = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger);
+        if (area) lista = lista.filter(r => (campo(r, "AREA") || "").trim() === area);
+        if (sub) lista = lista.filter(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim() === sub);
+
+        // Agrupar por responsable (mismo criterio que la tabla visual)
+        const mapU = new Map();
+        lista.forEach(item => {
+            const dni = normalizarDni(campo(item, "DNI"));
+            const nom = (campo(item, "USUARIO RESPONSABLE", "USUARIO") || "SIN ASIGNAR").trim();
+            const key = dni ? `${dni}_${nom}` : `S_DNI_${limpiarStr(campo(item, "SBN_CONCILIADO", "CODIGO"))}`;
+
+            if (!mapU.has(key)) {
+                mapU.set(key, {
+                    dni: dni || "S/DNI",
+                    nom: nom,
+                    total: 0,
+                    cpuCods: [],
+                    monCods: [],
+                    tecCods: []
+                });
+            }
+            const u = mapU.get(key);
+            u.total++;
+
+            const cod = limpiarStr(campo(item, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO")) || "S/N";
+            const p = detectarPestana(item).toUpperCase();
+
+            if (p.includes("CPU") || p.includes("LAPTO")) u.cpuCods.push(cod);
+            else if (p.includes("MONITOR")) u.monCods.push(cod);
+            else if (p.includes("TECLADO")) u.tecCods.push(cod);
+        });
+
+        // Construir filas para el Excel
+        const filas = [];
+        let n = 1;
+        mapU.forEach(u => {
+            filas.push({
+                "N°": n++,
+                "DNI": u.dni,
+                "USUARIO RESPONSABLE": u.nom,
+                "TOTAL EQUIPOS": u.total,
+                "CPU / LAPTOP (CANT.)": u.cpuCods.length,
+                "CPU / LAPTOP (CÓDIGOS SBN)": u.cpuCods.join(", ") || "-",
+                "MONITOR (CANT.)": u.monCods.length,
+                "MONITOR (CÓDIGOS SBN)": u.monCods.join(", ") || "-",
+                "TECLADO (CANT.)": u.tecCods.length,
+                "TECLADO (CÓDIGOS SBN)": u.tecCods.join(", ") || "-"
+            });
+        });
+
+        if (!filas.length) {
+            mostrarToast("No hay datos para exportar con los filtros actuales.", "warning");
             return;
         }
-        const ws = XLSX.utils.json_to_sheet(datosReporteModulo2Cache);
+
+        // Crear UNA SOLA HOJA
+        const ws = XLSX.utils.json_to_sheet(filas);
+
+        // Ajustar anchos de columna para mejor visualización
+        ws["!cols"] = [
+            { wch: 5 },   // N°
+            { wch: 12 },  // DNI
+            { wch: 38 },  // USUARIO RESPONSABLE
+            { wch: 14 },  // TOTAL EQUIPOS
+            { wch: 18 },  // CPU CANT
+            { wch: 45 },  // CPU SBN
+            { wch: 16 },  // MON CANT
+            { wch: 40 },  // MON SBN
+            { wch: 16 },  // TEC CANT
+            { wch: 40 }   // TEC SBN
+        ];
+
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Consolidado_TIC");
-        XLSX.writeFile(wb, `Reporte_Equipos_${Date.now()}.xlsx`);
-        mostrarToast("Excel descargado correctamente.", "success");
+        XLSX.utils.book_append_sheet(wb, ws, "Responsables_Equipos");
+
+        const nombreArchivo = `Reporte_TIC_${Date.now()}.xlsx`;
+        XLSX.writeFile(wb, nombreArchivo);
+        mostrarToast(`Excel descargado: ${filas.length} responsable(s).`, "success");
+    }
+
+    // =========================================================================
+    // MODAL DE MARCAS POR TIPO
+    // =========================================================================
+    function abrirModalMarcas(tipo) {
+        const ger = document.getElementById("m2Gerencia").value;
+        const area = document.getElementById("m2Area").value;
+        const sub = document.getElementById("m2SubArea").value;
+
+        if (!ger) {
+            mostrarToast("Primero genera un reporte con filtros.", "warning");
+            return;
+        }
+
+        let lista = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger);
+        if (area) lista = lista.filter(r => (campo(r, "AREA") || "").trim() === area);
+        if (sub) lista = lista.filter(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim() === sub);
+
+        const listaTipo = lista.filter(r => {
+            const p = detectarPestana(r).toUpperCase();
+            if (tipo === "CPU") return p.includes("CPU") || p.includes("LAPTO");
+            if (tipo === "MONITOR") return p.includes("MONITOR");
+            if (tipo === "TECLADO") return p.includes("TECLADO");
+            return false;
+        });
+
+        const marcasMap = {};
+        listaTipo.forEach(r => {
+            const m = normalizarMarca(campo(r, "MARCA"));
+            marcasMap[m] = (marcasMap[m] || 0) + 1;
+        });
+
+        const coloresMarca = {
+            "HP": "#0096D6", "LENOVO": "#E2231A", "DELL": "#007DB8", "ACER": "#83B81A",
+            "ASUS": "#00539B", "APPLE": "#555555", "SAMSUNG": "#1428A0", "LG": "#A50034",
+            "BROTHER": "#004B87", "EPSON": "#003399", "SIN MARCA": "#94a3b8"
+        };
+
+        const total = listaTipo.length;
+        const sorted = Object.entries(marcasMap).sort((a, b) => b[1] - a[1]);
+
+        const meta = {
+            "CPU":     { icon: "💻", color: "#2563eb", label: "CPU / Laptops" },
+            "MONITOR": { icon: "🖥️", color: "#10b981", label: "Monitores" },
+            "TECLADO": { icon: "⌨️", color: "#f59e0b", label: "Teclados" }
+        }[tipo] || { icon: "📦", color: "#64748b", label: tipo };
+
+        let filasHtml = "";
+        if (sorted.length === 0) {
+            filasHtml = `<div class="empty-state"><span class="icon">📭</span>No hay ${meta.label.toLowerCase()} en el área filtrada.</div>`;
+        } else {
+            sorted.forEach(([marca, count]) => {
+                const pct = total ? (count / total * 100) : 0;
+                const color = coloresMarca[marca] || "#64748b";
+                filasHtml += `
+                    <div class="modal-marca-row">
+                        <span class="modal-marca-dot" style="background:${color};"></span>
+                        <span class="modal-marca-name">${marca}</span>
+                        <span class="modal-marca-count">${count}</span>
+                        <div class="modal-marca-bar" style="grid-column: 2 / 4;">
+                            <div style="width:${pct}%; background:${color};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+        overlay.innerHTML = `
+            <div class="modal-marcas-box" style="border-top: 5px solid ${meta.color};">
+                <h3>${meta.icon} ${meta.label} — Distribución por Marca</h3>
+                <div class="modal-marcas-sub">
+                    Gerencia: <b>${ger}</b> · Área: <b>${area || "TODAS"}</b> · Subárea: <b>${sub || "TODAS"}</b>
+                </div>
+                <div class="modal-marcas-list">
+                    ${filasHtml}
+                </div>
+                <div class="modal-marcas-footer">
+                    <span>TOTAL ${meta.label.toUpperCase()}</span>
+                    <span>${total} ${total === 1 ? "equipo" : "equipos"} · ${sorted.length} ${sorted.length === 1 ? "marca" : "marcas"}</span>
+                </div>
+                <div class="modal-actions" style="margin-top: 14px;">
+                    <button class="btn btn-gray" id="modalMarcasCerrar">Cerrar</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const cerrar = () => overlay.remove();
+        overlay.querySelector("#modalMarcasCerrar").onclick = cerrar;
+        overlay.addEventListener("click", (e) => { if (e.target === overlay) cerrar(); });
+        const escHandler = (e) => {
+            if (e.key === "Escape") { cerrar(); document.removeEventListener("keydown", escHandler); }
+        };
+        document.addEventListener("keydown", escHandler);
+    }
+
+    // =========================================================================
+    // IMPRESIÓN A4
+    // =========================================================================
+    async function confirmarImpresionM2() {
+        const ok = await confirmar("Se abrirá una ventana con la vista previa en A4 lista para imprimir. ¿Continuar?", "🖨️ Vista Previa A4");
+        if (!ok) return;
+        imprimirVistaPreviaReporteM2();
     }
 
     function imprimirVistaPreviaReporteM2() {
         const el = document.getElementById("m2ContenedorReporte");
         if (!el || el.style.display === "none") return;
 
-        abrirVentanaImpresion(el.innerHTML, `
+        const clon = el.cloneNode(true);
+        clon.querySelectorAll("*").forEach(n => {
+            [...n.attributes].forEach(a => {
+                if (a.name.toLowerCase().startsWith("on")) n.removeAttribute(a.name);
+            });
+        });
+
+        abrirVentanaImpresion(clon.innerHTML, `
             @page { size: A4 portrait; margin: 15mm 15mm; }
             body { padding: 10mm; font-family: Arial, sans-serif; }
             .device-card-item { border: 1px solid #ccc; padding: 3px 5px; margin-bottom: 3px; font-size: 8.5pt; }
         `);
     }
 
+    async function confirmarLimpiarReporte() {
+        const ok = await confirmar("Se limpiarán todos los filtros y se ocultará el reporte. ¿Continuar?", "🧹 Limpiar Filtros");
+        if (!ok) return;
+        limpiarReporteModulo2();
+    }
+
     function limpiarReporteModulo2() {
         document.getElementById("m2Gerencia").value = "";
         document.getElementById("m2Area").innerHTML = '<option value="">-- Todas las Áreas --</option>';
         document.getElementById("m2SubArea").innerHTML = '<option value="">-- Todas las Subáreas --</option>';
-        document.getElementById("m2ContenedorReporte").style.display = "none";
-        document.getElementById("btnVistaPreviaM2").disabled = true;
+        ocultarReporteM2();
     }
 
     // =========================================================================
@@ -1820,7 +2114,7 @@
     function inicializarFiltrosModulo3() {
         const selG = document.getElementById("m3Gerencia");
         selG.innerHTML = '<option value="">-- Seleccione Gerencia --</option>';
-        const gerencias = [...new Set(inventario.map(r => (r["GERENCIA"] || "").trim()).filter(Boolean))].sort();
+        const gerencias = [...new Set(inventario.map(r => (campo(r, "GERENCIA") || "").trim()).filter(Boolean))].sort();
         gerencias.forEach(g => {
             const opt = document.createElement("option"); opt.value = g; opt.textContent = g;
             selG.appendChild(opt);
@@ -1837,7 +2131,7 @@
         selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
         if (!ger) return;
 
-        const areas = [...new Set(inventario.filter(r => (r["GERENCIA"] || "").trim() === ger).map(r => (r["AREA"] || "").trim()).filter(Boolean))].sort();
+        const areas = [...new Set(inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger).map(r => (campo(r, "AREA") || "").trim()).filter(Boolean))].sort();
         areas.forEach(a => {
             const opt = document.createElement("option"); opt.value = a; opt.textContent = a;
             selA.appendChild(opt);
@@ -1853,8 +2147,8 @@
         selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
         if (!area) return;
 
-        const sub = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger && (r["AREA"] || "").trim() === area);
-        const subareas = [...new Set(sub.map(r => (r["SUBAREA"] || "").trim()).filter(Boolean))].sort();
+        const sub = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger && (campo(r, "AREA") || "").trim() === area);
+        const subareas = [...new Set(sub.map(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim()).filter(Boolean))].sort();
         subareas.forEach(s => {
             const opt = document.createElement("option"); opt.value = s; opt.textContent = s;
             selS.appendChild(opt);
@@ -1868,13 +2162,13 @@
         const selU = document.getElementById("m3Servidor");
         selU.innerHTML = '<option value="">-- Seleccione Servidor --</option>';
 
-        let subset = inventario.filter(r => (r["GERENCIA"] || "").trim() === ger && (r["AREA"] || "").trim() === area);
-        if (sub) subset = subset.filter(r => (r["SUBAREA"] || "").trim() === sub);
+        let subset = inventario.filter(r => (campo(r, "GERENCIA") || "").trim() === ger && (campo(r, "AREA") || "").trim() === area);
+        if (sub) subset = subset.filter(r => (campo(r, "SUBAREA", "SUB_AREA") || "").trim() === sub);
 
         let mapServ = new Map();
         subset.forEach(r => {
-            const nom = (r["USUARIO RESPONSABLE"] || "").trim();
-            const dni = normalizarDni(r["DNI"]);
+            const nom = (campo(r, "USUARIO RESPONSABLE", "USUARIO") || "").trim();
+            const dni = normalizarDni(campo(r, "DNI"));
             if (nom && !mapServ.has(nom)) mapServ.set(nom, dni);
         });
 
@@ -1908,25 +2202,33 @@
         }
     }
 
-    function m3AgregarBienAlActa() {
+    async function m3AgregarBienAlActa() {
         const tipoBien = document.getElementById("m3TipoBien").value;
         const query = limpiarStr(document.getElementById("m3InCodigoBien").value);
         if (!query) { mostrarToast("Ingresa un código patrimonial o número de serie.", "warning"); return; }
 
-        const bien = inventario.find(r => limpiarStr(r["SBN_CONCILIADO"]) === query || limpiarStr(r["SERIE"]) === query);
-        let detalle = "", serie = "-", codigo = query;
+        const bien = inventario.find(r =>
+            limpiarStr(campo(r, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO")) === query ||
+            limpiarStr(campo(r, "SERIE")) === query
+        );
+        let detalle = "", serie = "-", codigo = query, esManual = false;
 
         if (bien) {
-            detalle = `${bien["DESCRIPCION DEL BIEN"] || tipoBien} ${bien["MARCA"] || ""} ${bien["MODELO"] || ""}`.trim();
-            serie = bien["SERIE"] || "-";
-            codigo = limpiarStr(bien["SBN_CONCILIADO"]);
+            detalle = `${campo(bien, "DESCRIPCION DEL BIEN", "DESCRIPCION") || tipoBien} ${campo(bien, "MARCA") || ""} ${campo(bien, "MODELO") || ""}`.trim();
+            serie = campo(bien, "SERIE") || "-";
+            codigo = limpiarStr(campo(bien, "SBN_CONCILIADO", "CODIGO_PATRIMONIAL", "CODIGO"));
         } else {
+            const ok = await confirmar(
+                `El código/serie "${query}" NO existe en el inventario. ¿Deseas agregarlo como <b>registro manual</b> al acta?`,
+                "⚠️ Bien no encontrado"
+            );
+            if (!ok) return;
             detalle = `${tipoBien} (REGISTRO MANUAL)`;
             serie = query;
+            esManual = true;
         }
 
         const tbody = document.getElementById("actaTableBody");
-
         const codigosExistentes = Array.from(tbody.querySelectorAll("tr")).map(tr => {
             const tds = tr.querySelectorAll("td");
             return tds[4] ? tds[4].textContent.trim() : "";
@@ -1937,7 +2239,6 @@
         }
 
         const nro = String(tbody.rows.length + 1).padStart(2, '0');
-
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>${nro}</td>
@@ -1945,7 +2246,7 @@
             <td contenteditable="true">1</td>
             <td contenteditable="true">${serie}</td>
             <td contenteditable="true">${codigo}</td>
-            <td contenteditable="true">OPERATIVO</td>
+            <td contenteditable="true">${esManual ? "VERIFICAR" : "OPERATIVO"}</td>
         `;
         tbody.appendChild(tr);
         document.getElementById("m3InCodigoBien").value = "";
@@ -1970,18 +2271,23 @@
         const selServ = document.getElementById("m3Servidor");
         const servidorDni = (selServ.options[selServ.selectedIndex] ? selServ.options[selServ.selectedIndex].dataset.dni : "") || document.getElementById("sigDniDer").textContent.trim();
 
-        const ogtiNom = "Mijael Rivera Lopez";
-        const ogtiDni = "48100357";
-
         if (modo === "ENTREGA") {
             boxEnt.innerText = "X"; boxRec.innerHTML = "&nbsp;"; txtAccion.innerText = "ENTREGA";
-            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.textContent = ogtiNom; dniIzq.textContent = ogtiDni;
+            titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.textContent = CONFIG.ogti.nombre; dniIzq.textContent = CONFIG.ogti.dni;
             titDer.innerText = "RECIBÍ CONFORME"; nomDer.textContent = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniDer.textContent = servidorDni || "72953853";
         } else {
             boxEnt.innerHTML = "&nbsp;"; boxRec.innerText = "X"; txtAccion.innerText = "RECEPCIÓN";
             titIzq.innerText = "ENTREGUÉ CONFORME"; nomIzq.textContent = servidorNom || "MINAYA SILENCIO, XIOMARA STHEFANIE"; dniIzq.textContent = servidorDni || "72953853";
-            titDer.innerText = "RECIBÍ CONFORME"; nomDer.textContent = ogtiNom; dniDer.textContent = ogtiDni;
+            titDer.innerText = "RECIBÍ CONFORME"; nomDer.textContent = CONFIG.ogti.nombre; dniDer.textContent = CONFIG.ogti.dni;
         }
+    }
+
+    async function confirmarLimpiarActa() {
+        const tbody = document.getElementById("actaTableBody");
+        if (tbody.rows.length === 0) { mostrarToast("La tabla ya está vacía.", "info"); return; }
+        const ok = await confirmar("Se eliminarán todos los bienes de la tabla del acta. ¿Continuar?", "🧹 Limpiar Tabla del Acta");
+        if (!ok) return;
+        m3LimpiarActa();
     }
 
     function m3LimpiarActa() {
@@ -1989,10 +2295,28 @@
         mostrarToast("Tabla del acta limpiada.", "info", 2000);
     }
 
+    async function confirmarImpresionActa() {
+        const tbody = document.getElementById("actaTableBody");
+        if (tbody.rows.length === 0) {
+            mostrarToast("Agrega al menos un bien antes de generar el acta.", "warning");
+            return;
+        }
+        const ok = await confirmar("Se abrirá la vista previa A4 del acta lista para imprimir/guardar como PDF. ¿Continuar?", "🖨️ Vista Previa del Acta");
+        if (!ok) return;
+        imprimirVistaPreviaActa();
+    }
+
     function imprimirVistaPreviaActa() {
         const el = document.getElementById("actaPreviewDocumento");
         if (!el) return;
-        abrirVentanaImpresion(el.outerHTML);
+
+        const clon = el.cloneNode(true);
+        clon.querySelectorAll("*").forEach(n => {
+            [...n.attributes].forEach(a => {
+                if (a.name.toLowerCase().startsWith("on")) n.removeAttribute(a.name);
+            });
+        });
+        abrirVentanaImpresion(clon.outerHTML);
     }
 
     // =========================================================================
